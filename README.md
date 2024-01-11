@@ -7,7 +7,7 @@ This tool allows members of the Houston Civic Symphony Music Selection Committee
 > [!NOTE]
 > Prerequisites: This is a .Net Framework application, and requires a Windows 10 or 11 computer (or emulation tool).
 
-To install, go to https://joedombrowski.com/apps/hcs-library-app/ and click the Install button.
+To install, go to https://joedombrowski.com/apps/hcs-library-tool/ and click the Install button.
 
 > [!IMPORTANT]
 > Windows may display one or more messages like "Windows protected your PC" when installing. This is simply because this isn't a well known program, and hasn't been white-listed by Microsoft.
@@ -70,7 +70,9 @@ This tab is used for managing and merging composers (See editing data)
 This is most useful for showing only pieces we own already, or only pieces that we have not performed in 10+ years.
 
 **Cell Formatting**
-TODO
+* Right click a column header and open the "Conditional Formatting" sub-menu.
+* From here, you can highlight the cell in basically any way you want.
+* Most useful may be "Color Scales" which can highlight the larger values in a column.
 
 ## Editing Data
 > [!IMPORTANT]
