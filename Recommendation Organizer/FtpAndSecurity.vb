@@ -1,9 +1,20 @@
-﻿Imports FluentFTP
+﻿Imports System.Net
+Imports FluentFTP
 Imports Utils.Encrypt
 
 Public Class FtpAndSecurity
 
-    Private Const _CREDS_ENC = "04nnwiUdtO/uVeDDbdeQUTm7LpP6u1+uOVEj3MSkjrKjR+2S19UgHLQO8aaeaTCB9f5rNlifPQezlmyoyER7fQ=="
+    Private Shared _CredentialsEncoded As String = Nothing
+
+    Shared Sub New()
+        Dim webClient As New WebClient()
+        Try
+            Dim encodedCreds As String = webClient.DownloadString("https://joedombrowski.com/apps/hcs-library-app/data/credentials.enc")
+            _CredentialsEncoded = encodedCreds
+        Catch ex As Exception
+            _CredentialsEncoded = Nothing
+        End Try
+    End Sub
 
     Friend Shared Function TestPasscode(passcode As String) As Boolean
         Dim connect As FtpClient = Nothing
@@ -30,7 +41,7 @@ Public Class FtpAndSecurity
 
     Friend Shared Function GetFtpConnection(passcode) As FtpClient
         Try
-            Dim creds = AES.Decrypt(_CREDS_ENC, PadPasscode(passcode))
+            Dim creds = AES.Decrypt(_CredentialsEncoded, PadPasscode(passcode))
             Return New FtpClient(creds.Split(Chr(31))(0), creds.Split(Chr(31))(1), creds.Split(Chr(31))(2))
         Catch ex As Exception
             Return Nothing

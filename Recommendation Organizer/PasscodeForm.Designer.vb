@@ -22,22 +22,22 @@ Partial Class PasscodeForm
         Me.LayoutControl1 = New DevExpress.XtraLayout.LayoutControl()
         Me.SimpleButton2 = New DevExpress.XtraEditors.SimpleButton()
         Me.SimpleButton1 = New DevExpress.XtraEditors.SimpleButton()
+        Me.TextEditPasscode = New DevExpress.XtraEditors.TextEdit()
         Me.Root = New DevExpress.XtraLayout.LayoutControlGroup()
         Me.LayoutControlItem1 = New DevExpress.XtraLayout.LayoutControlItem()
         Me.EmptySpaceItem1 = New DevExpress.XtraLayout.EmptySpaceItem()
         Me.LayoutControlItem3 = New DevExpress.XtraLayout.LayoutControlItem()
         Me.EmptySpaceItem2 = New DevExpress.XtraLayout.EmptySpaceItem()
         Me.LayoutControlItem4 = New DevExpress.XtraLayout.LayoutControlItem()
-        Me.TextEditPasscode = New DevExpress.XtraEditors.TextEdit()
         CType(Me.LayoutControl1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.LayoutControl1.SuspendLayout()
+        CType(Me.TextEditPasscode.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Root, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LayoutControlItem1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.EmptySpaceItem1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LayoutControlItem3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.EmptySpaceItem2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LayoutControlItem4, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.TextEditPasscode.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'LayoutControl1
@@ -72,6 +72,15 @@ Partial Class PasscodeForm
         Me.SimpleButton1.StyleController = Me.LayoutControl1
         Me.SimpleButton1.TabIndex = 5
         Me.SimpleButton1.Text = "Save"
+        '
+        'TextEditPasscode
+        '
+        Me.TextEditPasscode.Location = New System.Drawing.Point(69, 12)
+        Me.TextEditPasscode.Name = "TextEditPasscode"
+        Me.TextEditPasscode.Properties.UseSystemPasswordChar = True
+        Me.TextEditPasscode.Size = New System.Drawing.Size(347, 20)
+        Me.TextEditPasscode.StyleController = Me.LayoutControl1
+        Me.TextEditPasscode.TabIndex = 4
         '
         'Root
         '
@@ -125,15 +134,6 @@ Partial Class PasscodeForm
         Me.LayoutControlItem4.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItem4.TextVisible = False
         '
-        'TextEditPasscode
-        '
-        Me.TextEditPasscode.Location = New System.Drawing.Point(69, 12)
-        Me.TextEditPasscode.Name = "TextEditPasscode"
-        Me.TextEditPasscode.Properties.UseSystemPasswordChar = True
-        Me.TextEditPasscode.Size = New System.Drawing.Size(347, 20)
-        Me.TextEditPasscode.StyleController = Me.LayoutControl1
-        Me.TextEditPasscode.TabIndex = 4
-        '
         'PasscodeForm
         '
         Me.AcceptButton = Me.SimpleButton1
@@ -142,19 +142,20 @@ Partial Class PasscodeForm
         Me.CancelButton = Me.SimpleButton2
         Me.ClientSize = New System.Drawing.Size(428, 131)
         Me.Controls.Add(Me.LayoutControl1)
+        Me.IconOptions.SvgImage = Global.HcsLibraryTool.My.Resources.Resources.hcs_icon
         Me.KeyPreview = True
         Me.Name = "PasscodeForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Merge or Edit Composition"
+        Me.Text = "Enter Passcode"
         CType(Me.LayoutControl1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.LayoutControl1.ResumeLayout(False)
+        CType(Me.TextEditPasscode.Properties, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Root, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LayoutControlItem1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.EmptySpaceItem1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LayoutControlItem3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.EmptySpaceItem2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LayoutControlItem4, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.TextEditPasscode.Properties, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub

@@ -76,9 +76,9 @@ Namespace My
     Friend Module MySettingsProperty
         
         <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
-        Friend ReadOnly Property Settings() As Global.Recommendation_Organizer.My.MySettings
+        Friend ReadOnly Property Settings() As Global.HcsLibraryTool.My.MySettings
             Get
-                Return Global.Recommendation_Organizer.My.MySettings.Default
+                Return Global.HcsLibraryTool.My.MySettings.Default
             End Get
         End Property
     End Module

@@ -76,6 +76,7 @@ Partial Class Form1
         Me.GridView1.OptionsBehavior.Editable = False
         Me.GridView1.OptionsDetail.SmartDetailExpandButtonMode = DevExpress.XtraGrid.Views.Grid.DetailExpandButtonMode.CheckAllDetails
         Me.GridView1.OptionsSelection.MultiSelect = True
+        Me.GridView1.OptionsMenu.ShowConditionalFormattingItem = True
         '
         'BarManager1
         '

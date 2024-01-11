@@ -15,6 +15,17 @@ Public Class Form1
 
         ' Add any initialization after the InitializeComponent() call.
         _Context = Threading.SynchronizationContext.Current
+#If DEBUG Then
+        MsgBox("Attach Debugger")
+#End If
+
+        If Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
+            Try
+                Me.Text &= $" v{Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion:4}"
+            Catch ex As Exception
+            End Try
+        End If
+
         AddHandler Application.Idle, AddressOf LoadOnApplicationIdle
     End Sub
 
@@ -50,7 +61,7 @@ Public Class Form1
         If Not FtpAndSecurity.TestPasscode(My.Settings.Passcode) Then
             Dim fPass As New PasscodeForm()
             If Not fPass.ShowDialog Then
-                MsgBox("Passcode could not be validated. Application will exit...")
+                DevExpress.XtraEditors.XtraMessageBox.Show("Passcode could not be validated. Application will exit...")
                 Me.Close()
                 Return False
             End If
@@ -312,7 +323,7 @@ Public Class Form1
         Me.BarEditItem1.EditValue = 0
 
         If errorMessage <> Nothing Then
-            If MsgBox(errorMessage & Environment.NewLine & Environment.NewLine & "Would you like to save a copy locally?", MsgBoxStyle.YesNo, "Upload Failed") = MsgBoxResult.Yes Then
+            If DevExpress.XtraEditors.XtraMessageBox.Show(errorMessage & Environment.NewLine & Environment.NewLine & "Would you like to save a copy locally?", "Upload Failed", MessageBoxButtons.YesNo) = DialogResult.Yes Then
                 Dim sfd As New SaveFileDialog
                 sfd.FileName = $"library_{Now:yyyyMMddHHmmssfff}_export.dat"
                 If sfd.ShowDialog = DialogResult.OK Then

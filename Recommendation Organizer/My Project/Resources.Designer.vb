@@ -39,7 +39,7 @@ Namespace My.Resources
         Friend ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
             Get
                 If Object.ReferenceEquals(resourceMan, Nothing) Then
-                    Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("Recommendation_Organizer.Resources", GetType(Resources).Assembly)
+                    Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("HcsLibraryTool.Resources", GetType(Resources).Assembly)
                     resourceMan = temp
                 End If
                 Return resourceMan
@@ -63,9 +63,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
         '''</summary>
-        Friend ReadOnly Property vecteezy_music_note_logo_design_song_tone_illustration_8208353_copy() As DevExpress.Utils.Svg.SvgImage
+        Friend ReadOnly Property hcs_icon() As DevExpress.Utils.Svg.SvgImage
             Get
-                Dim obj As Object = ResourceManager.GetObject("vecteezy_music-note-logo-design-song-tone-illustration_8208353 copy", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("hcs-icon", resourceCulture)
                 Return CType(obj,DevExpress.Utils.Svg.SvgImage)
             End Get
         End Property

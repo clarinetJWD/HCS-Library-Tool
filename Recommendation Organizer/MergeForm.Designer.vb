@@ -20,6 +20,7 @@ Partial Class MergeForm
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.LayoutControl1 = New DevExpress.XtraLayout.LayoutControl()
+        Me.SimpleButton2 = New DevExpress.XtraEditors.SimpleButton()
         Me.SimpleButton1 = New DevExpress.XtraEditors.SimpleButton()
         Me.ComboBoxEditTitle = New DevExpress.XtraEditors.ComboBoxEdit()
         Me.ComboBoxEditComposer = New DevExpress.XtraEditors.ComboBoxEdit()
@@ -29,7 +30,6 @@ Partial Class MergeForm
         Me.EmptySpaceItem1 = New DevExpress.XtraLayout.EmptySpaceItem()
         Me.LayoutControlItem3 = New DevExpress.XtraLayout.LayoutControlItem()
         Me.EmptySpaceItem2 = New DevExpress.XtraLayout.EmptySpaceItem()
-        Me.SimpleButton2 = New DevExpress.XtraEditors.SimpleButton()
         Me.LayoutControlItem4 = New DevExpress.XtraLayout.LayoutControlItem()
         CType(Me.LayoutControl1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.LayoutControl1.SuspendLayout()
@@ -58,6 +58,16 @@ Partial Class MergeForm
         Me.LayoutControl1.TabIndex = 0
         Me.LayoutControl1.Text = "LayoutControl1"
         '
+        'SimpleButton2
+        '
+        Me.SimpleButton2.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.SimpleButton2.Location = New System.Drawing.Point(317, 97)
+        Me.SimpleButton2.Name = "SimpleButton2"
+        Me.SimpleButton2.Size = New System.Drawing.Size(99, 22)
+        Me.SimpleButton2.StyleController = Me.LayoutControl1
+        Me.SimpleButton2.TabIndex = 6
+        Me.SimpleButton2.Text = "Cancel"
+        '
         'SimpleButton1
         '
         Me.SimpleButton1.DialogResult = System.Windows.Forms.DialogResult.Cancel
@@ -66,7 +76,7 @@ Partial Class MergeForm
         Me.SimpleButton1.Size = New System.Drawing.Size(98, 22)
         Me.SimpleButton1.StyleController = Me.LayoutControl1
         Me.SimpleButton1.TabIndex = 5
-        Me.SimpleButton1.Text = "Merge Items"
+        Me.SimpleButton1.Text = "Save Changes"
         '
         'ComboBoxEditTitle
         '
@@ -139,16 +149,6 @@ Partial Class MergeForm
         Me.EmptySpaceItem2.Size = New System.Drawing.Size(203, 26)
         Me.EmptySpaceItem2.TextSize = New System.Drawing.Size(0, 0)
         '
-        'SimpleButton2
-        '
-        Me.SimpleButton2.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.SimpleButton2.Location = New System.Drawing.Point(317, 97)
-        Me.SimpleButton2.Name = "SimpleButton2"
-        Me.SimpleButton2.Size = New System.Drawing.Size(99, 22)
-        Me.SimpleButton2.StyleController = Me.LayoutControl1
-        Me.SimpleButton2.TabIndex = 6
-        Me.SimpleButton2.Text = "Cancel"
-        '
         'LayoutControlItem4
         '
         Me.LayoutControlItem4.Control = Me.SimpleButton2
@@ -166,6 +166,7 @@ Partial Class MergeForm
         Me.CancelButton = Me.SimpleButton2
         Me.ClientSize = New System.Drawing.Size(428, 131)
         Me.Controls.Add(Me.LayoutControl1)
+        Me.IconOptions.SvgImage = Global.HcsLibraryTool.My.Resources.Resources.hcs_icon
         Me.KeyPreview = True
         Me.Name = "MergeForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
