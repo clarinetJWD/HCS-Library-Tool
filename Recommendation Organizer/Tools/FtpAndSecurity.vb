@@ -9,7 +9,7 @@ Public Class FtpAndSecurity
     Shared Sub New()
         Dim webClient As New WebClient()
         Try
-            Dim encodedCreds As String = webClient.DownloadString("https://joedombrowski.com/apps/hcs-library-app/data/credentials.enc")
+            Dim encodedCreds As String = webClient.DownloadString("https://joedombrowski.com/apps/hcs-library-tool/data/credentials.enc")
             _CredentialsEncoded = encodedCreds
         Catch ex As Exception
             _CredentialsEncoded = Nothing

@@ -1,7 +1,9 @@
 ﻿Imports System.ComponentModel
 
 Public Class PasscodeForm
+
     Private _IsValidated As Boolean? = Nothing
+
     Sub New()
 
         ' This call is required by the designer.
@@ -11,7 +13,7 @@ Public Class PasscodeForm
         Me.TextEditPasscode.Text = My.Settings.Passcode
     End Sub
 
-    Private Sub SimpleButton1_Click(sender As Object, e As EventArgs) Handles SimpleButton1.Click
+    Private Sub SimpleButtonSave_Click(sender As Object, e As EventArgs) Handles SimpleButtonSave.Click
         Dim passcode As String = TextEditPasscode.EditValue
         My.Settings.Passcode = passcode
         My.Settings.Save()
@@ -39,4 +41,5 @@ Public Class PasscodeForm
         End If
         Return _IsValidated.Value
     End Function
+
 End Class

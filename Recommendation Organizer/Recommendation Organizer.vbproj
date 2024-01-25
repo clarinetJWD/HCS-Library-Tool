@@ -34,7 +34,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>8</ApplicationRevision>
+    <ApplicationRevision>11</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -155,30 +155,57 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.vb">
+    <Compile Include="Data\ConcertInformations.vb" />
+    <Compile Include="Data\Constants.vb" />
+    <Compile Include="Data\Library\LibraryData.vb" />
+    <Compile Include="Data\LocalConcertInformations.vb" />
+    <Compile Include="Data\PublishedSeasonIndexes.vb" />
+    <Compile Include="Events\ErrorCodeEventArgs.vb" />
+    <Compile Include="Events\ProgressBarEventArgs.vb" />
+    <Compile Include="Tools\Tools.vb" />
+    <Compile Include="UI\ConcertGrid.Designer.vb">
+      <DependentUpon>ConcertGrid.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ConcertGrid.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Data\ComposerAliases.vb" />
+    <Compile Include="Data\Eras.vb" />
+    <Compile Include="Data\HoldingEntry.vb" />
+    <Compile Include="Data\Interfaces.vb" />
+    <Compile Include="Data\Musician.vb" />
+    <Compile Include="Data\MusicianRecommendation.vb" />
+    <Compile Include="Data\NameIdBase.vb" />
+    <Compile Include="Data\RecommendationList.vb" />
+    <Compile Include="Data\RepertoireEntry.vb" />
+    <Compile Include="Data\SeasonPlanningList.vb" />
+    <Compile Include="Data\Tags.vb" />
+    <Compile Include="UI\Form1.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.vb">
+    <Compile Include="UI\Form1.Designer.vb">
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ComposerMergeForm.Designer.vb">
+    <Compile Include="UI\ComposerMergeForm.Designer.vb">
       <DependentUpon>ComposerMergeForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="ComposerMergeForm.vb">
+    <Compile Include="UI\ComposerMergeForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FtpAndSecurity.vb" />
-    <Compile Include="PasscodeForm.Designer.vb">
+    <Compile Include="Tools\FtpAndSecurity.vb" />
+    <Compile Include="Data\Presenters\LibraryToolPresenter.vb" />
+    <Compile Include="Data\Models\LibraryToolModel.vb" />
+    <Compile Include="UI\PasscodeForm.Designer.vb">
       <DependentUpon>PasscodeForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="PasscodeForm.vb">
+    <Compile Include="UI\PasscodeForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MergeForm.Designer.vb">
+    <Compile Include="UI\MergeForm.Designer.vb">
       <DependentUpon>MergeForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="MergeForm.vb">
+    <Compile Include="UI\MergeForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -199,16 +226,19 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="UI\ConcertGrid.resx">
+      <DependentUpon>ConcertGrid.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Form1.resx">
       <DependentUpon>Form1.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ComposerMergeForm.resx">
+    <EmbeddedResource Include="UI\ComposerMergeForm.resx">
       <DependentUpon>ComposerMergeForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PasscodeForm.resx">
+    <EmbeddedResource Include="UI\PasscodeForm.resx">
       <DependentUpon>PasscodeForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MergeForm.resx">
+    <EmbeddedResource Include="UI\MergeForm.resx">
       <DependentUpon>MergeForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\licenses.licx" />

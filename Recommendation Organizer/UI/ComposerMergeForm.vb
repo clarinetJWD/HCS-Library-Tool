@@ -5,6 +5,7 @@ Public Class ComposerMergeForm
     ReadOnly Property MergedItem As ComposerAlias = Nothing
 
     Private _composers As IEnumerable(Of ComposerAlias)
+
     Sub Initialize(composers As IEnumerable(Of ComposerAlias))
 
         _composers = composers
@@ -24,7 +25,7 @@ Public Class ComposerMergeForm
         Me.ComboBoxEditComposer.SelectedIndex = 0
     End Sub
 
-    Private Sub SimpleButton1_Click(sender As Object, e As EventArgs) Handles SimpleButton1.Click
+    Private Sub SimpleButtonSave_Click(sender As Object, e As EventArgs) Handles SimpleButtonSave.Click
         Dim primaryComposer As String = ComboBoxEditComposer.EditValue
 
         Dim alternateComposers As New BindingList(Of String)
@@ -41,4 +42,5 @@ Public Class ComposerMergeForm
 
         Me.Close()
     End Sub
+
 End Class
