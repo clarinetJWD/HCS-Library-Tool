@@ -22,7 +22,7 @@ Public Class ConcertInformation : Implements INotifyPropertyChanged
             RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Tags)))
         End Set
     End Property
-    Private WithEvents _Compositions As SeasonPlanningList
+    Private WithEvents _Compositions As New SeasonPlanningList
 
     Property [Date] As Date
         Get

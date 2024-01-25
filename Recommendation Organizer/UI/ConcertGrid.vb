@@ -69,8 +69,13 @@ Public Class ConcertGrid
 
         GridViewProgram.BestFitColumns()
 
+        DateEditConcertDate.DataBindings.Clear()
         DateEditConcertDate.DataBindings.Add(New Binding(NameOf(DateEditConcertDate.EditValue), concertInformation, NameOf(concertInformation.Date), False, DataSourceUpdateMode.OnPropertyChanged))
+
+        TextEditLocation.DataBindings.Clear()
         TextEditLocation.DataBindings.Add(New Binding(NameOf(TextEditLocation.EditValue), concertInformation, NameOf(concertInformation.Location), False, DataSourceUpdateMode.OnPropertyChanged))
+
+        ProgressBarControlDifficulty.DataBindings.Clear()
         ProgressBarControlDifficulty.DataBindings.Add(New Binding(NameOf(ProgressBarControlDifficulty.Position), concertInformation, NameOf(concertInformation.DifficultyScore), False, DataSourceUpdateMode.OnPropertyChanged))
 
         SetTitleText()

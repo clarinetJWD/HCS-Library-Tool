@@ -1,6 +1,6 @@
 ﻿Public Class LocalConcertInformations
-    Property WorkingConcertInformations As ConcertInformations
-    Property WorkingSeasonIndex As PublishedSeasonIndex
+    Property WorkingConcertInformations As ConcertInformations = Nothing
+    Property WorkingSeasonIndex As PublishedSeasonIndex = Nothing
 
     Friend Function ContainsComposition(seasonItem As SeasonItem) As Boolean
         If WorkingConcertInformations Is Nothing Then Return False

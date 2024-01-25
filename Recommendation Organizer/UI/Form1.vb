@@ -515,7 +515,7 @@ Public Class Form1 : Implements INotifyPropertyChanged
                           Dim concertGrids As New List(Of ConcertGrid) From {ConcertGrid1, ConcertGrid2, ConcertGrid3, ConcertGrid4, ConcertGrid5, ConcertGrid6}
 
                           For i As Integer = 0 To concertGrids.Count - 1
-                              Dim concertInfo = If(_Presenter.WorkingSeasonInformation.WorkingConcertInformations.Count > i, _Presenter.WorkingSeasonInformation.WorkingConcertInformations(i), Nothing)
+                              Dim concertInfo = If(_Presenter.WorkingSeasonInformation.WorkingConcertInformations.Count > i, _Presenter.WorkingSeasonInformation.WorkingConcertInformations(i), New ConcertInformation)
                               concertGrids(i).InitializeInfo(concertInfo, _Presenter.Eras, _Presenter.Tags)
                           Next
 
@@ -1178,4 +1178,18 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
 #End Region
 
+
+    Private Sub BarButtonItem1_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItem1.ItemClick
+        Dim webClient As New Net.WebClient()
+
+        For Each rec In _Presenter.Library
+            PopulateMetadata(rec)
+        Next
+
+
+    End Sub
+
+    Private Sub PopulateMetadata(rec As Recommendation)
+
+    End Sub
 End Class

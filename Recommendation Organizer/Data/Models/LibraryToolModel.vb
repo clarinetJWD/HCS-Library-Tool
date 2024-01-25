@@ -894,7 +894,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                             localInfosInternal = ser.Deserialize(fs)
                         End Using
                     Else
-                        localInfosInternal = New LocalConcertInformations()
+                        localInfosInternal = New LocalConcertInformations() With {.WorkingConcertInformations = New ConcertInformations}
                     End If
 
                     Return localInfosInternal

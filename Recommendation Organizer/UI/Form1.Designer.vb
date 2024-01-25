@@ -40,6 +40,7 @@ Partial Class Form1
         Me.BarSubItemEditSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarButtonItemCopySeasonToPlanningList = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemLayoutMenu = New DevExpress.XtraBars.BarSubItem()
+        Me.BarButtonItem1 = New DevExpress.XtraBars.BarButtonItem()
         Me.BarStatus = New DevExpress.XtraBars.Bar()
         Me.BarEditItemProgressBar = New DevExpress.XtraBars.BarEditItem()
         Me.RepositoryItemProgressBar1 = New DevExpress.XtraEditors.Repository.RepositoryItemProgressBar()
@@ -175,9 +176,9 @@ Partial Class Form1
         Me.BarManager1.DockControls.Add(Me.barDockControlLeft)
         Me.BarManager1.DockControls.Add(Me.barDockControlRight)
         Me.BarManager1.Form = Me
-        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibraryComposers, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarButtonItemCopySeasonToPlanningList, Me.BarSubItemDeleteSeason})
+        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibraryComposers, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarButtonItemCopySeasonToPlanningList, Me.BarSubItemDeleteSeason, Me.BarButtonItem1})
         Me.BarManager1.MainMenu = Me.BarMainMenu
-        Me.BarManager1.MaxItemId = 19
+        Me.BarManager1.MaxItemId = 20
         Me.BarManager1.RepositoryItems.AddRange(New DevExpress.XtraEditors.Repository.RepositoryItem() {Me.RepositoryItemProgressBar1, Me.RepositoryItemMarqueeProgressBar1})
         Me.BarManager1.StatusBar = Me.BarStatus
         '
@@ -187,7 +188,7 @@ Partial Class Form1
         Me.BarMainMenu.DockCol = 0
         Me.BarMainMenu.DockRow = 0
         Me.BarMainMenu.DockStyle = DevExpress.XtraBars.BarDockStyle.Top
-        Me.BarMainMenu.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditLibraryComposers), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemLayoutMenu)})
+        Me.BarMainMenu.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditLibraryComposers), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemLayoutMenu), New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItem1)})
         Me.BarMainMenu.OptionsBar.AllowQuickCustomization = False
         Me.BarMainMenu.OptionsBar.DisableClose = True
         Me.BarMainMenu.OptionsBar.DisableCustomization = True
@@ -277,6 +278,13 @@ Partial Class Form1
         Me.BarSubItemLayoutMenu.Id = 8
         Me.BarSubItemLayoutMenu.Name = "BarSubItemLayoutMenu"
         Me.BarSubItemLayoutMenu.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
+        '
+        'BarButtonItem1
+        '
+        Me.BarButtonItem1.Caption = "META"
+        Me.BarButtonItem1.Id = 19
+        Me.BarButtonItem1.Name = "BarButtonItem1"
+        Me.BarButtonItem1.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
         '
         'BarStatus
         '
@@ -985,4 +993,5 @@ Partial Class Form1
     Friend WithEvents LayoutControlItemMetadataTagsGrid As DevExpress.XtraLayout.LayoutControlItem
     Friend WithEvents BarSubItemDeleteSeason As DevExpress.XtraBars.BarSubItem
     Friend WithEvents LayoutControlItemSeasonConcert1 As DevExpress.XtraLayout.LayoutControlItem
+    Friend WithEvents BarButtonItem1 As DevExpress.XtraBars.BarButtonItem
 End Class
