@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.ComponentModel.DataAnnotations
 
 Public Class Tags : Inherits BindingList(Of Tag) : Implements ISupportHasChanges, INotifyPropertyChanged
 
@@ -7,16 +8,16 @@ Public Class Tags : Inherits BindingList(Of Tag) : Implements ISupportHasChanges
     Public Property HasChanges As Boolean Implements ISupportHasChanges.HasChanges
         Get
             If _HasChanges Then Return True
-            For Each era In Me
-                If era.HasChanges Then Return True
+            For Each tag In Me
+                If tag.HasChanges Then Return True
             Next
             Return False
         End Get
         Set(value As Boolean)
             _HasChanges = value
             If Not value Then
-                For Each era In Me
-                    era.HasChanges = value
+                For Each tag In Me
+                    tag.HasChanges = value
                 Next
             End If
             RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(HasChanges)))
@@ -55,6 +56,45 @@ Public Class Tags : Inherits BindingList(Of Tag) : Implements ISupportHasChanges
 End Class
 
 Public Class Tag : Inherits NameIdBase
+
+    <Xml.Serialization.XmlIgnore>
+    Property Color As Color
+        Get
+            Return _Color
+        End Get
+        Set(value As Color)
+            If value <> _Color Then
+                HasChanges = True
+                _Color = value
+                RaisePropertyChangedEvent(NameOf(Color))
+            End If
+        End Set
+    End Property
+    Private _Color As Color = Color.Transparent
+
+    <Display(AutoGenerateField:=False)>
+    <Xml.Serialization.XmlElement(ElementName:="Color")>
+    Property ColorString As String
+        Get
+            Return $"{Color.R},{Color.G},{Color.B}"
+        End Get
+        Set(value As String)
+            Dim colorTokens = value.Split(",")
+            If colorTokens.Count = 3 Then
+                Dim r As Integer
+                Dim g As Integer
+                Dim b As Integer
+                If Integer.TryParse(colorTokens(0), r) Then
+                    If Integer.TryParse(colorTokens(1), g) Then
+                        If Integer.TryParse(colorTokens(2), b) Then
+                            Me.Color = Color.FromArgb(r, g, b)
+                        End If
+                    End If
+                End If
+            End If
+        End Set
+    End Property
+
     Shared Widening Operator CType(value As String) As Tag
         Return New Tag(value)
     End Operator

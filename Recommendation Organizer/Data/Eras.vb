@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.ComponentModel.DataAnnotations
 
 Public Class Eras : Inherits BindingList(Of Era) : Implements ISupportHasChanges, INotifyPropertyChanged
 
@@ -52,9 +53,58 @@ Public Class Eras : Inherits BindingList(Of Era) : Implements ISupportHasChanges
         Return Nothing
     End Function
 
+    Friend Function Find(item As String) As Era
+        If item = Nothing Then Return Nothing
+
+        For Each listItem In Me
+            If If(listItem.Name <> Nothing, listItem.Name.ToUpper, String.Empty) = item.ToUpper.Trim Then
+                Return listItem
+            End If
+        Next
+        Return Nothing
+    End Function
+
 End Class
 
 Public Class Era : Inherits NameIdBase : Implements IEquatable(Of Era)
+
+    <Xml.Serialization.XmlIgnore>
+    Property Color As Color
+        Get
+            Return _Color
+        End Get
+        Set(value As Color)
+            If value <> _Color Then
+                HasChanges = True
+                _Color = value
+                RaisePropertyChangedEvent(NameOf(Color))
+            End If
+        End Set
+    End Property
+    Private _Color As Color = Color.Transparent
+
+    <Display(AutoGenerateField:=False)>
+    <Xml.Serialization.XmlElement(ElementName:="Color")>
+    Property ColorString As String
+        Get
+            Return $"{Color.R},{Color.G},{Color.B}"
+        End Get
+        Set(value As String)
+            Dim colorTokens = value.Split(",")
+            If colorTokens.Count = 3 Then
+                Dim r As Integer
+                Dim g As Integer
+                Dim b As Integer
+                If Integer.TryParse(colorTokens(0), r) Then
+                    If Integer.TryParse(colorTokens(1), g) Then
+                        If Integer.TryParse(colorTokens(2), b) Then
+                            Me.Color = Color.FromArgb(r, g, b)
+                        End If
+                    End If
+                End If
+            End If
+        End Set
+    End Property
 
     Shared Widening Operator CType(value As String) As Era
         Return New Era(value)

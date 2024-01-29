@@ -60,19 +60,15 @@ Public Class ComposerAliases : Inherits BindingList(Of ComposerAlias) : Implemen
     End Sub
 
     Friend Function FindComposer(rec As IComposer) As ComposerAlias
+
+
         Return Me.ToList.Find(Function(x)
-                                  Dim pName = If(x.PrimaryName = Nothing, String.Empty, x.PrimaryName.ToUpper.Trim)
-                                  Dim recName = If(rec.Composer = Nothing, String.Empty, rec.Composer.ToUpper.Trim)
-
-
-                                  If pName = recName Then Return True
-                                  If x.Aliases.Select(Function(y) y.ToUpper.Trim).Contains(recName) Then Return True
-                                  Return False
+                                  Return x.Equals(rec)
                               End Function)
     End Function
 End Class
 
-Public Class ComposerAlias : Implements INotifyPropertyChanged, IComposer, ISupportHasChanges
+Public Class ComposerAlias : Implements INotifyPropertyChanged, IComposer, IComposerMetadata, ISupportHasChanges, IEquatable(Of IComposer), IEquatable(Of String)
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
@@ -103,6 +99,34 @@ Public Class ComposerAlias : Implements INotifyPropertyChanged, IComposer, ISupp
         End Set
     End Property
     Private _PrimaryName As String
+
+    Property Era As Era Implements IComposerMetadata.Era
+        Get
+            Return _Era
+        End Get
+        Set(value As Era)
+            If Not _Era Is value Then
+                HasChanges = True
+                _Era = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Era)))
+            End If
+        End Set
+    End Property
+    Private _Era As Era
+
+    Property MetadataId As Integer Implements IComposerMetadata.MetadataId
+        Get
+            Return _MetadataId
+        End Get
+        Set(value As Integer)
+            If Not _MetadataId = value Then
+                HasChanges = True
+                _MetadataId = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(MetadataId)))
+            End If
+        End Set
+    End Property
+    Private _MetadataId As Integer = -1
 
     <Editable(False)>
     <Display(AutoGenerateField:=False)>
@@ -155,4 +179,23 @@ Public Class ComposerAlias : Implements INotifyPropertyChanged, IComposer, ISupp
         HasChanges = True
     End Sub
 
+    Public Shadows Function Equals(other As IComposer) As Boolean Implements IEquatable(Of IComposer).Equals
+        Return Equals(other.Composer)
+    End Function
+
+
+    Public Shadows Function Equals(other As String) As Boolean Implements IEquatable(Of String).Equals
+        Dim otherName = If(other = Nothing, String.Empty, other.ToUpper.Trim)
+        Dim meName = If(Me.PrimaryName = Nothing, String.Empty, Me.PrimaryName.ToUpper.Trim)
+        Dim meNameNoComma = FormatNameWithNoCommas(meName)
+
+
+        If otherName = meName Then Return True
+        If otherName = meNameNoComma Then Return True
+
+        If Me.Aliases.Select(Function(y) y.ToUpper.Trim).Contains(otherName) Then Return True
+        If Me.Aliases.Select(Function(y) FormatNameWithNoCommas(y.ToUpper.Trim)).Contains(otherName) Then Return True
+
+        Return False
+    End Function
 End Class

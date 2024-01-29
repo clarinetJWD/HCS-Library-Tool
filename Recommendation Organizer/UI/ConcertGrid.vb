@@ -1,11 +1,13 @@
 ﻿Imports System.ComponentModel
 Imports DevExpress.Utils.Behaviors
 Imports DevExpress.Utils.DragDrop
+Imports DevExpress.XtraGrid.Views.Grid
 
 Public Class ConcertGrid
 
 #Region "Properties"
 
+    Private ReadOnly Property _Presenter As LibraryToolPresenter
     Private ReadOnly Property _ConcertInformation As ConcertInformation
 
     Public Property Title As String
@@ -23,16 +25,42 @@ Public Class ConcertGrid
 
 #Region "Initialization"
 
-    Friend Sub Initialize(behaviorManager1 As BehaviorManager)
-
+    Friend Sub Initialize(presenter As LibraryToolPresenter, behaviorManager1 As BehaviorManager)
+        __Presenter = presenter
         behaviorManager1.Attach(Of DragDropBehavior)(GridViewProgram,
                                                      Sub(behavior)
                                                          behavior.Properties.AllowDrop = True
                                                          behavior.Properties.AllowDrag = True
                                                          behavior.Properties.InsertIndicatorVisible = True
                                                          behavior.Properties.PreviewVisible = True
+                                                         AddHandler behavior.DragDrop, AddressOf OnDragDropToSeasonGrid
                                                      End Sub)
 
+    End Sub
+
+    Private Sub OnDragDropToSeasonGrid(sender As Object, e As DragDropEventArgs)
+
+        Dim sourceView = DirectCast(e.Source, GridView)
+        Dim rowsToMove As New List(Of SeasonItem)
+        For Each dataHandle As Integer In e.Data
+            Dim row As SeasonItem = sourceView.GetRow(dataHandle)
+            rowsToMove.Add(row)
+        Next
+        Dim targetView = DirectCast(e.Target, GridView)
+
+        Select Case e.Action
+            Case DragDropActions.Copy
+                For Each row In rowsToMove
+                    targetView.DataSource.Add(row)
+                Next
+                e.Handled = True
+            Case DragDropActions.Move
+                For Each row In rowsToMove
+                    sourceView.DataSource.Remove(row)
+                    targetView.DataSource.Add(row)
+                Next
+                e.Handled = True
+        End Select
     End Sub
 
     Friend Sub InitializeInfo(concertInformation As ConcertInformation, eras As Eras, tags As Tags)
@@ -177,12 +205,30 @@ Public Class ConcertGrid
     End Sub
 
     Private Sub TokenEditEras_CustomDrawTokenBackground(sender As Object, e As DevExpress.XtraEditors.TokenEditCustomDrawTokenBackgroundEventArgs) Handles TokenEditEras.CustomDrawTokenBackground
-        e.Cache.FillRoundedRectangle(Color.FromArgb(40, Color.Green), e.Bounds, New DevExpress.Utils.Drawing.CornerRadius(4))
+        e.Cache.FillRoundedRectangle(Color.FromArgb(40, GetColorForEraDescription(e.Description)), e.Bounds, New DevExpress.Utils.Drawing.CornerRadius(4))
     End Sub
 
+    Private Function GetColorForEraDescription(era As String) As Color
+        Dim foundEra = _Presenter.Eras.Find(era)
+        If foundEra IsNot Nothing AndAlso foundEra.Color <> Color.Transparent Then
+            Return foundEra.Color
+        End If
+
+        Return Color.Gray
+    End Function
+
     Private Sub TokenEditTags_CustomDrawTokenBackground(sender As Object, e As DevExpress.XtraEditors.TokenEditCustomDrawTokenBackgroundEventArgs) Handles TokenEditTags.CustomDrawTokenBackground
-        e.Cache.FillRoundedRectangle(Color.FromArgb(40, Color.Orange), e.Bounds, New DevExpress.Utils.Drawing.CornerRadius(4))
+        e.Cache.FillRoundedRectangle(Color.FromArgb(40, GetColorForTagaDescription(e.Description)), e.Bounds, New DevExpress.Utils.Drawing.CornerRadius(4))
     End Sub
+
+    Private Function GetColorForTagaDescription(tag As String) As Color
+        Dim foundTag = _Presenter.Tags.Find(tag)
+        If foundTag IsNot Nothing AndAlso foundTag.Color <> Color.Transparent Then
+            Return foundTag.Color
+        End If
+
+        Return Color.Gray
+    End Function
 
     Private Sub GridViewProgram_CustomDrawCell(sender As Object, e As DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs) Handles GridViewProgram.CustomDrawCell
         If e.Column.FieldName = NameOf(SeasonItem.Length) Then

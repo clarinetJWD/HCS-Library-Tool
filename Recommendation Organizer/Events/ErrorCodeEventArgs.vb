@@ -10,6 +10,7 @@
         SaveLibraryFailedBecauseRemoteFileCouldNotBeReplaced
         SaveLibraryFailedBecauseFileCouldNotBeUploaded
         SaveLibraryFailedBecauseTheRemoteFileIsNewer
+        SaveLibraryFailedForAnUnknownReason
         LoadSeasonProposalFromIndexFailedBecauseTheFileFailedToDownload
         LoadSeasonProposalFromIndexFailedBecauseTheFileDoesNotExist
         LoadSeasonProposalFromIndexFailedUnknownReason

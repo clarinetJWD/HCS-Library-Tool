@@ -1,5 +1,6 @@
 ﻿Imports System.ComponentModel
 Imports System.ComponentModel.DataAnnotations
+Imports System.Net
 Imports FluentFTP
 
 Public Class LibraryToolModel : Implements INotifyPropertyChanged
@@ -145,6 +146,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
     Friend Sub AddSeasonPlannerItem(seasonItem As Recommendation)
         Me.SeasonPlannerItems.Add(New SeasonItem(seasonItem))
+        EnsureNoSeasonPlanningDuplicates()
     End Sub
 
     Friend Sub RemoveSeasonPlannerItem(recommendation As Recommendation)
@@ -158,6 +160,9 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                     Exit Sub
                 End If
             Next
+        End If
+        If HiddenSeasonPlannerItems.FindSeasonItem(recommendation) IsNot Nothing Then
+            HiddenSeasonPlannerItems.Remove(HiddenSeasonPlannerItems.FindSeasonItem(recommendation))
         End If
     End Sub
 
@@ -209,7 +214,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                     client = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
                     client.AutoConnect()
 
-                    Dim dlStatus = client.DownloadFile(LocalPath_Library_Temp("temp"), FtpPath_Library, FtpLocalExists.Overwrite, FtpVerify.OnlyChecksum,
+                    Dim dlStatus = client.DownloadFile(LocalPath_Library_Temp("temp"), FtpPath_Library, FtpLocalExists.Overwrite, FtpVerify.Retry,
                                                        Sub(prg As FtpProgress)
                                                            RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
                                                                 .Minimum = 0,
@@ -259,6 +264,9 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             End If
 
             Return True
+        Catch ex As Exception
+            RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {.ErrorCode = ErrorCodeEventArgs.ErrorCodes.SaveLibraryFailedForAnUnknownReason, .ShowMode = ErrorCodeEventArgs.ShowModes.StatusBar})
+            Return False
         Finally
             If client IsNot Nothing Then client.Disconnect()
             If client IsNot Nothing Then client.Dispose()
@@ -273,14 +281,14 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             Library.Remove(selection)
 
             Dim seasonPlannerItem = Me.SeasonPlannerItems.FindSeasonItem(selection)
-            If seasonPlannerItem IsNot Nothing Then seasonPlannerItem.Recommendation = newItem
+            If seasonPlannerItem IsNot Nothing Then seasonPlannerItem.SetRecommendation(newItem, True)
 
             Dim hiddenSeasonPlannerItem = Me.HiddenSeasonPlannerItems.FindSeasonItem(selection)
-            If hiddenSeasonPlannerItem IsNot Nothing Then hiddenSeasonPlannerItem.Recommendation = newItem
+            If hiddenSeasonPlannerItem IsNot Nothing Then hiddenSeasonPlannerItem.SetRecommendation(newItem, True)
 
             For Each concert In Me.WorkingSeasonInformation.WorkingConcertInformations
                 Dim concertItem = concert.Compositions.FindSeasonItem(selection)
-                If concertItem IsNot Nothing Then concertItem.Recommendation = newItem
+                If concertItem IsNot Nothing Then concertItem.SetRecommendation(newItem, True)
             Next
         Next
         Library.Add(newItem)
@@ -441,7 +449,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                 For Each comp In item.Compositions
                     Dim foundRec = Library.FindRecommendation(comp)
                     If foundRec IsNot Nothing Then
-                        comp.Recommendation = foundRec
+                        comp.SetRecommendation(foundRec, False)
                     End If
                 Next
             Next
@@ -463,7 +471,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             For Each item In value
                 Dim foundRec = Library.FindRecommendation(item)
                 If foundRec IsNot Nothing Then
-                    item.Recommendation = foundRec
+                    item.SetRecommendation(foundRec, False)
                 End If
             Next
 
@@ -484,7 +492,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             For Each item In value
                 Dim foundRec = Library.FindRecommendation(item)
                 If foundRec IsNot Nothing Then
-                    item.Recommendation = foundRec
+                    item.SetRecommendation(foundRec, False)
                 End If
             Next
 
@@ -637,8 +645,14 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                     Dim ser As New Xml.Serialization.XmlSerializer(GetType(ConcertInformations))
                     Dim newSeasonData As ConcertInformations = ser.Deserialize(fs)
 
-
-
+                    For Each concert In newSeasonData
+                        For Each composition In concert.Compositions
+                            Dim foundItem = Library.FindRecommendation(composition)
+                            If foundItem IsNot Nothing Then
+                                composition.SetRecommendation(foundItem, False)
+                            End If
+                        Next
+                    Next
 
                     Me.WorkingSeasonInformation = New LocalConcertInformations() With {.WorkingConcertInformations = newSeasonData, .WorkingSeasonIndex = publishedSeasonIndex}
 
@@ -796,6 +810,12 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                             Using fs As New IO.FileStream(LocalPath_SeasonPlanningItems, IO.FileMode.Open)
                                 Dim ser As New Xml.Serialization.XmlSerializer(GetType(SeasonPlanningList))
                                 seasonPlannerItemsInternal = ser.Deserialize(fs)
+                                For Each item In seasonPlannerItemsInternal
+                                    Dim foundRec = Me.Library.FindRecommendation(item)
+                                    If foundRec IsNot Nothing Then
+                                        item.SetRecommendation(foundRec, False)
+                                    End If
+                                Next
                             End Using
                         Catch ex As Exception
                             Try
@@ -893,6 +913,15 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                             Dim ser As New Xml.Serialization.XmlSerializer(GetType(LocalConcertInformations))
                             localInfosInternal = ser.Deserialize(fs)
                         End Using
+
+                        For Each concertInfo In localInfosInternal.WorkingConcertInformations
+                            For Each composition In concertInfo.Compositions
+                                Dim foundRec = Me.Library.FindRecommendation(composition)
+                                If foundRec IsNot Nothing Then
+                                    composition.SetRecommendation(foundRec, False)
+                                End If
+                            Next
+                        Next
                     Else
                         localInfosInternal = New LocalConcertInformations() With {.WorkingConcertInformations = New ConcertInformations}
                     End If

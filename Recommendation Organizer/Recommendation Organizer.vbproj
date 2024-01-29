@@ -15,7 +15,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>ftp://ftp.joedombrowski.com/joedombrowski.com/apps/hcs-library-tool/</PublishUrl>
+    <PublishUrl>E:\Joe\Projects\Houston Civic Symphony\Software\LibraryTool\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -34,7 +34,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>11</ApplicationRevision>
+    <ApplicationRevision>13</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -120,6 +120,9 @@
       <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.KeyDerivation.7.0.13\lib\net462\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -157,6 +160,11 @@
   <ItemGroup>
     <Compile Include="Data\ConcertInformations.vb" />
     <Compile Include="Data\Constants.vb" />
+    <Compile Include="Data\JsonMetadata\ComposerMetadatas.vb" />
+    <Compile Include="Data\JsonMetadata\ComposerSearchJsonResult.vb" />
+    <Compile Include="Data\JsonMetadata\ComposerSearchJsonResultComposer.vb" />
+    <Compile Include="Data\JsonMetadata\ComposerSearchJsonResultRequest.vb" />
+    <Compile Include="Data\JsonMetadata\ComposerSearchJsonResultStatus.vb" />
     <Compile Include="Data\Library\LibraryData.vb" />
     <Compile Include="Data\LocalConcertInformations.vb" />
     <Compile Include="Data\PublishedSeasonIndexes.vb" />

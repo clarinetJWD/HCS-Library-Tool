@@ -20,7 +20,7 @@ Public Class RecommendationList : Inherits BindingList(Of Recommendation) : Impl
         End Set
     End Property
 
-    Friend Function FindRecommendation(mRec As IComposerTitle) As Recommendation
+    Friend Function FindRecommendation(mRec As IComposerTitleKey) As Recommendation
         For Each recommendation In Me
             If recommendation.IsMatch(mRec) Then
                 Return recommendation
@@ -73,9 +73,28 @@ Public Class RecommendationList : Inherits BindingList(Of Recommendation) : Impl
 
 End Class
 
-Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrangerTitle, IComposerAlternates, IMetadata, ISupportHasChanges
+Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrangerTitleKey, IComposerAlternates, IMetadata, ISupportHasChanges
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    <Display(AutoGenerateField:=False)>
+    <Editable(False)>
+    Property Key As String Implements IKey.Key
+        Get
+            If _Key = Nothing Then
+                _Key = Guid.NewGuid.ToString
+            End If
+            Return _Key
+        End Get
+        Set(value As String)
+            If _Key <> value Then
+                HasChanges = True
+                _Key = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Key)))
+            End If
+        End Set
+    End Property
+    Private WithEvents _Key As String = Nothing
 
     <Editable(False)>
     Property Composer As String Implements IComposer.Composer
@@ -215,8 +234,6 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
     Private Sub OnTagsListChanged(sender As Object, e As ListChangedEventArgs) Handles _Tags.ListChanged
         RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Tags)))
         RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(TagsString)))
-
-        HasChanges = True
     End Sub
 
     <Editable(False)>
@@ -353,6 +370,19 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
 
     <Editable(False)>
     <Display(AutoGenerateField:=False)>
+    Public Property HasMetadataFromComposer As Boolean
+        Get
+            Return _HasMetadataFromComposer
+        End Get
+        Set(value As Boolean)
+            _HasMetadataFromComposer = value
+            RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(HasMetadataFromComposer)))
+        End Set
+    End Property
+    Private _HasMetadataFromComposer As Boolean
+
+    <Editable(False)>
+    <Display(AutoGenerateField:=False)>
     Public Property HasChanges As Boolean Implements ISupportHasChanges.HasChanges
         Get
             Return _HasChanges
@@ -364,7 +394,11 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
     End Property
     Private _HasChanges As Boolean = True
 
-    Friend Function IsMatch(mRec As IComposerTitle) As Boolean
+    Friend Function IsMatch(mRec As IComposerTitleKey) As Boolean
+        If Me.Key <> Nothing AndAlso mRec.Key <> Nothing AndAlso Me.Key = mRec.Key Then
+            Return True
+        End If
+
         Dim composerNames As New List(Of String) From {If(Me.Composer = Nothing, String.Empty, Me.Composer.ToUpper.Trim)}
         composerNames.AddRange(Me.AlternateComposerSpellings.Select(Function(x) x.ToUpper.Trim))
         If Me.Arranger <> Nothing Then
@@ -376,8 +410,8 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
 
         Dim recComposerName = If(mRec.Composer = Nothing, String.Empty, mRec.Composer.ToUpper.Trim)
         Dim recArrName = String.Empty
-        If TypeOf mRec Is IComposerArrangerTitle Then
-            recArrName = If(DirectCast(mRec, IComposerArrangerTitle).Arranger = Nothing, String.Empty, DirectCast(mRec, IComposerArrangerTitle).Arranger.ToUpper.Trim)
+        If TypeOf mRec Is IComposerArrangerTitleKey Then
+            recArrName = If(DirectCast(mRec, IComposerArrangerTitleKey).Arranger = Nothing, String.Empty, DirectCast(mRec, IComposerArrangerTitleKey).Arranger.ToUpper.Trim)
         End If
         Dim recTitle = If(mRec.Title = Nothing, String.Empty, mRec.Title.ToUpper.Trim)
 

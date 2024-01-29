@@ -61,6 +61,10 @@ Public Class NameIdBase : Implements INotifyPropertyChanged, IConvertible, ISupp
 
     End Sub
 
+    Sub RaisePropertyChangedEvent(propertyName)
+        RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(propertyName))
+    End Sub
+
     Public Overrides Function ToString() As String
         Return Name
     End Function

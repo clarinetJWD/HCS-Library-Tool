@@ -79,10 +79,12 @@ Public Class ConcertInformation : Implements INotifyPropertyChanged
 
 
     <Display(AutoGenerateField:=False)>
+    <Xml.Serialization.XmlIgnore>
     ReadOnly Property Eras As Eras
         Get
             Dim _eras As New Eras
             For Each composition In Compositions
+                If composition.Recommendation Is Nothing Then Continue For
                 If _eras.ToList.Find(Function(x) x = composition.Recommendation.Era) Is Nothing Then
                     _eras.Add(composition.Recommendation.Era)
                 End If
@@ -93,10 +95,12 @@ Public Class ConcertInformation : Implements INotifyPropertyChanged
     End Property
 
     <Display(AutoGenerateField:=False)>
+    <Xml.Serialization.XmlIgnore>
     ReadOnly Property Tags As Tags
         Get
             Dim _tags As New Tags
             For Each composition In Compositions
+                If composition.Recommendation Is Nothing Then Continue For
                 For Each tag In composition.Recommendation.Tags
                     If _tags.ToList.Find(Function(x) x.Name = tag.Name) Is Nothing Then
                         _tags.Add(tag)

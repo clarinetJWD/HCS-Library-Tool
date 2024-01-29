@@ -25,7 +25,11 @@ End Interface
 
 Public Interface IComposer : Inherits INotifyPropertyChanged
     Property Composer As String
+End Interface
 
+Public Interface IComposerMetadata : Inherits INotifyPropertyChanged
+    Property Era As Era
+    Property MetadataId As Integer
 End Interface
 
 Public Interface IArranger : Inherits INotifyPropertyChanged
@@ -38,11 +42,24 @@ Public Interface ITitle : Inherits INotifyPropertyChanged
 
 End Interface
 
+Public Interface IKey : Inherits INotifyPropertyChanged
+    Property Key As String
+
+End Interface
+
 Public Interface IComposerTitle : Inherits IComposer, ITitle
 
 End Interface
 
+Public Interface IComposerTitleKey : Inherits IComposerTitle, IKey
+
+End Interface
+
 Public Interface IComposerArrangerTitle : Inherits IComposerTitle, IArranger
+
+End Interface
+
+Public Interface IComposerArrangerTitleKey : Inherits IComposerArrangerTitle, IComposerTitleKey
 
 End Interface
 

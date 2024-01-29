@@ -191,23 +191,29 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
         If e.Page Is TabNavigationPageLibrary Then
             Me.BarSubItemFileLibrary.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
+            Me.BarSubItemFileMetadata.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
             Me.BarSubItemFileSeason.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
 
-            Me.BarSubItemEditLibraryComposers.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
+            Me.BarSubItemEditLibrary.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
+            Me.BarSubItemEditMetadata.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
             Me.BarSubItemEditSeason.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
 
         ElseIf e.Page Is TabNavigationPageMetadata Then
-            Me.BarSubItemFileLibrary.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
+            Me.BarSubItemFileLibrary.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
+            Me.BarSubItemFileMetadata.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
             Me.BarSubItemFileSeason.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
 
-            Me.BarSubItemEditLibraryComposers.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
+            Me.BarSubItemEditLibrary.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
+            Me.BarSubItemEditMetadata.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
             Me.BarSubItemEditSeason.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
 
         ElseIf e.Page Is TabNavigationPageSeasonPlanner Then
             Me.BarSubItemFileLibrary.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
+            Me.BarSubItemFileMetadata.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
             Me.BarSubItemFileSeason.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
 
-            Me.BarSubItemEditLibraryComposers.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
+            Me.BarSubItemEditLibrary.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
+            Me.BarSubItemEditMetadata.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
             Me.BarSubItemEditSeason.Visibility = DevExpress.XtraBars.BarItemVisibility.Always
 
         End If
@@ -250,7 +256,7 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
     Private Sub InitializeConcertGrids()
         For Each concertGrid In GetConcertGrids()
-            concertGrid.Initialize(BehaviorManager1)
+            concertGrid.Initialize(_Presenter, BehaviorManager1)
         Next
 
         BehaviorManager1.Attach(Of DragDropBehavior)(GridViewSeasonPlanner,
@@ -259,7 +265,33 @@ Public Class Form1 : Implements INotifyPropertyChanged
                                                          behavior.Properties.AllowDrag = True
                                                          behavior.Properties.InsertIndicatorVisible = True
                                                          behavior.Properties.PreviewVisible = True
+                                                         AddHandler behavior.DragDrop, AddressOf OnDragDropToPlannerGrid
                                                      End Sub)
+    End Sub
+
+    Private Sub OnDragDropToPlannerGrid(sender As Object, e As DragDropEventArgs)
+
+        Dim sourceView = DirectCast(e.Source, GridView)
+        Dim rowsToMove As New List(Of SeasonItem)
+        For Each dataHandle As Integer In e.Data
+            Dim row As SeasonItem = sourceView.GetRow(dataHandle)
+            rowsToMove.Add(row)
+        Next
+        Dim targetView = DirectCast(e.Target, GridView)
+
+        Select Case e.Action
+            Case DragDropActions.Copy
+                For Each row In rowsToMove
+                    _Presenter.AddSeasonPlannerItem(row.Recommendation)
+                Next
+                e.Handled = True
+            Case DragDropActions.Move
+                For Each row In rowsToMove
+                    sourceView.DataSource.remove(row)
+                    _Presenter.AddSeasonPlannerItem(row.Recommendation)
+                Next
+                e.Handled = True
+        End Select
     End Sub
 
     Private Function GetConcertGrids() As List(Of ConcertGrid)
@@ -462,6 +494,8 @@ Public Class Form1 : Implements INotifyPropertyChanged
                           GridControlComposers.DataSource = _Presenter.Composers
                           If _Presenter?.Composers IsNot Nothing Then
                               GridViewComposers.Columns("PrimaryName").SortIndex = 0
+                              GridViewComposers.Columns("Era").Visible = False
+                              GridViewComposers.Columns("MetadataId").Visible = False
                           End If
                           GridControlComposers.EndUpdate()
 
@@ -893,6 +927,10 @@ Public Class Form1 : Implements INotifyPropertyChanged
                 messageCaption = "Library Save Error"
                 messageText = "Library update failed because file could not be uploaded."
                 buttons = MessageBoxButtons.OK
+            Case ErrorCodeEventArgs.ErrorCodes.SaveLibraryFailedForAnUnknownReason
+                messageCaption = "Library Save Error"
+                messageText = "Library update failed for an unknown reason."
+                buttons = MessageBoxButtons.OK
             Case ErrorCodeEventArgs.ErrorCodes.SaveLibraryFailedBecauseTheRemoteFileIsNewer
                 messageCaption = "Library Save Error"
                 messageText = "Library update failed because the remote library is newer." & Environment.NewLine & Environment.NewLine & "Would you like to save a copy locally?"
@@ -905,6 +943,7 @@ Public Class Form1 : Implements INotifyPropertyChanged
                                                       IO.File.Copy(LocalPath_Library, sfd.FileName)
                                                   End If
                                               End Sub)
+
             Case ErrorCodeEventArgs.ErrorCodes.CouldNotLoadUserSeasonPlanningList
                 messageCaption = "Season Planning Error"
                 messageText = "Could not load user season planning list."
@@ -1178,18 +1217,72 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
 #End Region
 
+#Region "Metadata Fetch"
 
-    Private Sub BarButtonItem1_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItem1.ItemClick
-        Dim webClient As New Net.WebClient()
+    Private _Metadatas As New ComposerMetadatas
 
+    Private Sub BarButtonItemRefreshMetadataAll_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemRefreshMetadataAll.ItemClick
         For Each rec In _Presenter.Library
+            rec.HasMetadataFromComposer = False
             PopulateMetadata(rec)
         Next
+    End Sub
 
+    Private Sub BarButtonItemRefreshMetadataSelected_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemRefreshMetadataSelected.ItemClick
+
+        Dim selections As New List(Of Recommendation)
+        If GridViewLibrary.GetSelectedRows.Count > 0 Then
+            For Each selectedRowHandle In GridViewLibrary.GetSelectedRows
+                selections.Add(GridViewLibrary.GetRow(selectedRowHandle))
+            Next
+        End If
+        If selections.Count > 0 Then
+            For Each rec In selections
+                rec.HasMetadataFromComposer = False
+                PopulateMetadata(rec)
+            Next
+        End If
 
     End Sub
 
     Private Sub PopulateMetadata(rec As Recommendation)
+        If rec.HasMetadataFromComposer Then Exit Sub
 
+        Dim composer = _Presenter.Composers.FindComposer(rec)
+        If composer IsNot Nothing Then
+            rec.HasMetadataFromComposer = True
+
+            Dim composerMetadata As ComposerMetadata = GetComposerMetadata(composer)
+            If composerMetadata IsNot Nothing Then
+                If composerMetadata.Metadata Is Nothing Then Exit Sub
+
+                Dim foundEra = _Presenter.Eras.Find(composerMetadata.Metadata.epoch)
+
+                Dim shouldReplaceEra As Boolean = True
+                If composer.Era IsNot Nothing AndAlso composer.Era.Name <> Nothing Then
+                    shouldReplaceEra = False
+                    If Not composer.Era.Equals(foundEra) Then
+                        If DevExpress.XtraEditors.XtraMessageBox.Show($"Replace era {composer.Era.Name} with {foundEra.Name} for {composer.PrimaryName}?", "Replace Era?", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                            shouldReplaceEra = True
+                        End If
+                    End If
+                End If
+                If shouldReplaceEra Then composer.Era = foundEra
+                composer.MetadataId = composerMetadata.Metadata.id
+
+                If foundEra IsNot Nothing Then
+                    rec.Era = composer.Era
+                End If
+            End If
+        End If
     End Sub
+
+    Private Function GetComposerMetadata(composer As ComposerAlias) As ComposerMetadata
+        Dim metadata = _Metadatas.GetMetadata(composer)
+        _Metadatas.Add(metadata)
+        Return metadata
+    End Function
+
+#End Region
+
 End Class

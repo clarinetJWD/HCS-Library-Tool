@@ -3,7 +3,7 @@ Imports System.ComponentModel.DataAnnotations
 
 Public Class SeasonPlanningList : Inherits BindingList(Of SeasonItem)
 
-    Friend Function FindSeasonItem(mRec As IComposerTitle) As SeasonItem
+    Friend Function FindSeasonItem(mRec As IComposerTitleKey) As SeasonItem
         For Each recommendation In Me
             If recommendation.IsMatch(mRec) Then
                 Return recommendation
@@ -21,37 +21,44 @@ Public Class SeasonPlanningList : Inherits BindingList(Of SeasonItem)
     End Operator
 End Class
 
-Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTitle, IComposerAlternates, ISupportHasChanges, IMetadata
+Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTitleKey, IComposerAlternates, ISupportHasChanges, IMetadata
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
     Public Property Composer As String Implements IComposer.Composer
         Get
-            Return Recommendation?.Composer
+            Return If(Recommendation?.Composer, _Composer)
         End Get
         Set(value As String)
             If Recommendation IsNot Nothing Then Recommendation.Composer = value
+            _Composer = value
         End Set
     End Property
+    Private _Composer As String
 
     Public Property Arranger As String Implements IArranger.Arranger
         Get
-            Return Recommendation?.Arranger
+            Return If(Recommendation?.Arranger, _Arranger)
         End Get
         Set(value As String)
             If Recommendation IsNot Nothing Then Recommendation.Arranger = value
+            _Arranger = value
         End Set
     End Property
+    Private _Arranger As String
 
     Public Property Title As String Implements ITitle.Title
         Get
-            Return Recommendation?.Title
+            Return If(Recommendation?.Title, _Title)
         End Get
         Set(value As String)
             If Recommendation IsNot Nothing Then Recommendation.Title = value
+            _Title = value
         End Set
     End Property
+    Private _Title As String
 
+    <Xml.Serialization.XmlIgnore>
     Public Property Length As TimeSpan Implements IMetadata.Length
         Get
             Return Recommendation?.Length
@@ -61,6 +68,7 @@ Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTi
         End Set
     End Property
 
+    <Xml.Serialization.XmlIgnore>
     Public Property Difficulty As Difficulties Implements IMetadata.Difficulty
         Get
             Return Recommendation?.Difficulty
@@ -70,6 +78,7 @@ Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTi
         End Set
     End Property
 
+    <Xml.Serialization.XmlIgnore>
     Public Property Era As Era Implements IMetadata.Era
         Get
             Return Recommendation?.Era
@@ -79,6 +88,7 @@ Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTi
         End Set
     End Property
 
+    <Xml.Serialization.XmlIgnore>
     Public Property Tags As Tags Implements IMetadata.Tags
         Get
             Return Recommendation?.Tags
@@ -88,6 +98,7 @@ Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTi
         End Set
     End Property
 
+    <Xml.Serialization.XmlIgnore>
     Public Property AlternateComposerSpellings As BindingList(Of String) Implements IComposerAlternates.AlternateComposerSpellings
         Get
             Return Recommendation?.AlternateComposerSpellings
@@ -97,15 +108,30 @@ Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTi
         End Set
     End Property
 
-    Public Property Recommendation As Recommendation
+    <Xml.Serialization.XmlIgnore>
+    Public ReadOnly Property Recommendation As Recommendation
         Get
             Return _Recommendation
         End Get
-        Set(value As Recommendation)
-            _Recommendation = value
-            _Recommendation.RaiseAllPropertyChangedEvents()
+    End Property
+    Friend Sub SetRecommendation(recommendation As Recommendation, raiseEvents As Boolean)
+        If _Recommendation Is Nothing OrElse recommendation IsNot _Recommendation Then
+            _Recommendation = recommendation
+            If raiseEvents Then _Recommendation.RaiseAllPropertyChangedEvents()
+        End If
+    End Sub
+
+    <Display(AutoGenerateField:=False)>
+    <Editable(False)>
+    Public Property RecommendationKey As String Implements IKey.Key
+        Get
+            Return If(_Recommendation?.Key, _RecommendationKey)
+        End Get
+        Set(value As String)
+            _RecommendationKey = value
         End Set
     End Property
+    Private _RecommendationKey As String
 
     <Editable(False)>
     <Display(AutoGenerateField:=False)>
@@ -115,6 +141,11 @@ Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTi
         End Get
         Set(value As Boolean)
             _HasChanges = False
+            If Not value Then
+                If _Recommendation IsNot Nothing Then
+                    _Recommendation.HasChanges = False
+                End If
+            End If
             RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(HasChanges)))
         End Set
     End Property
@@ -123,11 +154,11 @@ Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTi
     Private WithEvents _Recommendation As Recommendation = Nothing
 
     Sub New()
-        Me.Recommendation = New Recommendation
+
     End Sub
 
     Sub New(recommendation As Recommendation)
-        Me.Recommendation = recommendation
+        SetRecommendation(recommendation, False)
     End Sub
 
     Private Sub OnBasePropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles _Recommendation.PropertyChanged
@@ -135,7 +166,7 @@ Public Class SeasonItem : Implements INotifyPropertyChanged, IComposerArrangerTi
         RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(e.PropertyName))
     End Sub
 
-    Friend Function IsMatch(mRec As IComposerTitle) As Boolean
+    Friend Function IsMatch(mRec As IComposerTitleKey) As Boolean
         Return Recommendation.IsMatch(mRec)
     End Function
 

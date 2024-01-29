@@ -85,4 +85,14 @@ Module Tools
             Return Regex.Replace(inputString, "[^0-9]+", "", RegexOptions.Compiled)
         End If
     End Function
+
+    Friend Function FormatNameWithNoCommas(primaryName As String) As String
+        If primaryName.Contains(",") Then
+            Dim nameTokens = primaryName.Split(",").ToList.Select(Function(x) x.Trim).ToList
+            nameTokens.Reverse()
+
+            Return String.Join(" ", nameTokens).Trim
+        End If
+        Return primaryName.Trim
+    End Function
 End Module

@@ -35,12 +35,12 @@ Partial Class Form1
         Me.BarSubItemLoadSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemPublishSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemDeleteSeason = New DevExpress.XtraBars.BarSubItem()
-        Me.BarSubItemEditLibraryComposers = New DevExpress.XtraBars.BarSubItem()
+        Me.BarSubItemEditLibrary = New DevExpress.XtraBars.BarSubItem()
         Me.BarButtonItemMergeSelected = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemEditSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarButtonItemCopySeasonToPlanningList = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemLayoutMenu = New DevExpress.XtraBars.BarSubItem()
-        Me.BarButtonItem1 = New DevExpress.XtraBars.BarButtonItem()
+        Me.BarButtonItemRefreshMetadataAll = New DevExpress.XtraBars.BarButtonItem()
         Me.BarStatus = New DevExpress.XtraBars.Bar()
         Me.BarEditItemProgressBar = New DevExpress.XtraBars.BarEditItem()
         Me.RepositoryItemProgressBar1 = New DevExpress.XtraEditors.Repository.RepositoryItemProgressBar()
@@ -99,6 +99,9 @@ Partial Class Form1
         Me.DragDropEvents2 = New DevExpress.Utils.DragDrop.DragDropEvents(Me.components)
         Me.DragDropEvents1 = New DevExpress.Utils.DragDrop.DragDropEvents(Me.components)
         Me.BehaviorManager1 = New DevExpress.Utils.Behaviors.BehaviorManager(Me.components)
+        Me.BarSubItemFileMetadata = New DevExpress.XtraBars.BarSubItem()
+        Me.BarSubItemEditMetadata = New DevExpress.XtraBars.BarSubItem()
+        Me.BarButtonItemRefreshMetadataSelected = New DevExpress.XtraBars.BarButtonItem()
         CType(Me.GridControlLibrary, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridViewLibrary, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BarManager1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -176,9 +179,9 @@ Partial Class Form1
         Me.BarManager1.DockControls.Add(Me.barDockControlLeft)
         Me.BarManager1.DockControls.Add(Me.barDockControlRight)
         Me.BarManager1.Form = Me
-        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibraryComposers, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarButtonItemCopySeasonToPlanningList, Me.BarSubItemDeleteSeason, Me.BarButtonItem1})
+        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibrary, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarButtonItemCopySeasonToPlanningList, Me.BarSubItemDeleteSeason, Me.BarButtonItemRefreshMetadataAll, Me.BarSubItemFileMetadata, Me.BarSubItemEditMetadata, Me.BarButtonItemRefreshMetadataSelected})
         Me.BarManager1.MainMenu = Me.BarMainMenu
-        Me.BarManager1.MaxItemId = 20
+        Me.BarManager1.MaxItemId = 24
         Me.BarManager1.RepositoryItems.AddRange(New DevExpress.XtraEditors.Repository.RepositoryItem() {Me.RepositoryItemProgressBar1, Me.RepositoryItemMarqueeProgressBar1})
         Me.BarManager1.StatusBar = Me.BarStatus
         '
@@ -188,7 +191,7 @@ Partial Class Form1
         Me.BarMainMenu.DockCol = 0
         Me.BarMainMenu.DockRow = 0
         Me.BarMainMenu.DockStyle = DevExpress.XtraBars.BarDockStyle.Top
-        Me.BarMainMenu.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditLibraryComposers), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemLayoutMenu), New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItem1)})
+        Me.BarMainMenu.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileMetadata), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditMetadata), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemLayoutMenu)})
         Me.BarMainMenu.OptionsBar.AllowQuickCustomization = False
         Me.BarMainMenu.OptionsBar.DisableClose = True
         Me.BarMainMenu.OptionsBar.DisableCustomization = True
@@ -244,12 +247,12 @@ Partial Class Form1
         Me.BarSubItemDeleteSeason.Id = 18
         Me.BarSubItemDeleteSeason.Name = "BarSubItemDeleteSeason"
         '
-        'BarSubItemEditLibraryComposers
+        'BarSubItemEditLibrary
         '
-        Me.BarSubItemEditLibraryComposers.Caption = "Edit"
-        Me.BarSubItemEditLibraryComposers.Id = 5
-        Me.BarSubItemEditLibraryComposers.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemMergeSelected)})
-        Me.BarSubItemEditLibraryComposers.Name = "BarSubItemEditLibraryComposers"
+        Me.BarSubItemEditLibrary.Caption = "Edit"
+        Me.BarSubItemEditLibrary.Id = 5
+        Me.BarSubItemEditLibrary.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemMergeSelected), New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemRefreshMetadataAll, True), New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemRefreshMetadataSelected)})
+        Me.BarSubItemEditLibrary.Name = "BarSubItemEditLibrary"
         '
         'BarButtonItemMergeSelected
         '
@@ -279,12 +282,11 @@ Partial Class Form1
         Me.BarSubItemLayoutMenu.Name = "BarSubItemLayoutMenu"
         Me.BarSubItemLayoutMenu.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
         '
-        'BarButtonItem1
+        'BarButtonItemRefreshMetadataAll
         '
-        Me.BarButtonItem1.Caption = "META"
-        Me.BarButtonItem1.Id = 19
-        Me.BarButtonItem1.Name = "BarButtonItem1"
-        Me.BarButtonItem1.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
+        Me.BarButtonItemRefreshMetadataAll.Caption = "Refresh All Metadata"
+        Me.BarButtonItemRefreshMetadataAll.Id = 19
+        Me.BarButtonItemRefreshMetadataAll.Name = "BarButtonItemRefreshMetadataAll"
         '
         'BarStatus
         '
@@ -853,6 +855,26 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert6.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert6.TextVisible = False
         '
+        'BarSubItemFileMetadata
+        '
+        Me.BarSubItemFileMetadata.Caption = "File"
+        Me.BarSubItemFileMetadata.Id = 20
+        Me.BarSubItemFileMetadata.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemSaveAll)})
+        Me.BarSubItemFileMetadata.Name = "BarSubItemFileMetadata"
+        '
+        'BarSubItemEditMetadata
+        '
+        Me.BarSubItemEditMetadata.Caption = "Edit"
+        Me.BarSubItemEditMetadata.Id = 22
+        Me.BarSubItemEditMetadata.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemMergeSelected)})
+        Me.BarSubItemEditMetadata.Name = "BarSubItemEditMetadata"
+        '
+        'BarButtonItemRefreshMetadataSelected
+        '
+        Me.BarButtonItemRefreshMetadataSelected.Caption = "Refresh Metadata for Selected Item"
+        Me.BarButtonItemRefreshMetadataSelected.Id = 23
+        Me.BarButtonItemRefreshMetadataSelected.Name = "BarButtonItemRefreshMetadataSelected"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -936,7 +958,7 @@ Partial Class Form1
     Friend WithEvents BarButtonItemImportFromCsv As DevExpress.XtraBars.BarButtonItem
     Friend WithEvents BarSubItemFileLibrary As DevExpress.XtraBars.BarSubItem
     Friend WithEvents BarButtonItemSaveAll As DevExpress.XtraBars.BarButtonItem
-    Friend WithEvents BarSubItemEditLibraryComposers As DevExpress.XtraBars.BarSubItem
+    Friend WithEvents BarSubItemEditLibrary As DevExpress.XtraBars.BarSubItem
     Friend WithEvents BarStatus As DevExpress.XtraBars.Bar
     Friend WithEvents BarEditItemProgressBar As DevExpress.XtraBars.BarEditItem
     Friend WithEvents RepositoryItemProgressBar1 As DevExpress.XtraEditors.Repository.RepositoryItemProgressBar
@@ -993,5 +1015,8 @@ Partial Class Form1
     Friend WithEvents LayoutControlItemMetadataTagsGrid As DevExpress.XtraLayout.LayoutControlItem
     Friend WithEvents BarSubItemDeleteSeason As DevExpress.XtraBars.BarSubItem
     Friend WithEvents LayoutControlItemSeasonConcert1 As DevExpress.XtraLayout.LayoutControlItem
-    Friend WithEvents BarButtonItem1 As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents BarButtonItemRefreshMetadataAll As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents BarSubItemFileMetadata As DevExpress.XtraBars.BarSubItem
+    Friend WithEvents BarSubItemEditMetadata As DevExpress.XtraBars.BarSubItem
+    Friend WithEvents BarButtonItemRefreshMetadataSelected As DevExpress.XtraBars.BarButtonItem
 End Class
