@@ -471,10 +471,10 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
         End Try
     End Function
 
-    Friend Sub AddSeasonPlannerItem(reccomendation As Recommendation)
+    Friend Sub AddSeasonPlannerItem(reccomendation As Recommendation, Optional insertAtIndex As Integer = -1)
         Try
             IsAllowedClose = False
-            _Model.AddSeasonPlannerItem(reccomendation)
+            _Model.AddSeasonPlannerItem(reccomendation, insertAtIndex)
         Finally
             IsAllowedClose = True
         End Try

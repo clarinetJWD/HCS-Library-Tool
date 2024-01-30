@@ -292,10 +292,29 @@ Public Class Form1 : Implements INotifyPropertyChanged
                 Next
                 e.Handled = True
             Case DragDropActions.Move
-                For Each row In rowsToMove
+                Dim hi = targetView.CalcHitInfo(targetView.GridControl.PointToClient(e.Location))
+                Dim insertLocation = targetView.DataRowCount
+                If hi.InDataRow AndAlso e.InsertType <> InsertType.AsChild Then
+                    Dim targetRow As SeasonItem = targetView.GetRow(hi.RowHandle)
+                    insertLocation = targetView.DataSource.IndexOf(targetRow)
+                    If e.InsertType <> InsertType.Before Then
+                        insertLocation += 1
+                    End If
+                End If
+
+                For i As Integer = rowsToMove.Count - 1 To 0 Step -1
+                    Dim row = rowsToMove(i)
                     sourceView.DataSource.remove(row)
-                    _Presenter.AddSeasonPlannerItem(row.Recommendation)
+                    _Presenter.AddSeasonPlannerItem(row.Recommendation, insertLocation)
+
+                    Dim foundItem = _Presenter.SeasonPlannerItems.FindSeasonItem(row)
+
+                    Dim ind = _Presenter.SeasonPlannerItems.IndexOf(foundItem)
+                    Dim handle = targetView.GetRowHandle(ind)
+
+                    targetView.FocusedRowHandle = handle
                 Next
+
                 e.Handled = True
         End Select
     End Sub

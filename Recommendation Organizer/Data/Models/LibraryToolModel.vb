@@ -116,8 +116,14 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
     End Function
 
-    Friend Sub AddSeasonPlannerItem(seasonItem As Recommendation)
-        Me.SeasonPlannerItems.Add(New SeasonItem(seasonItem))
+    Friend Sub AddSeasonPlannerItem(seasonItem As Recommendation, Optional insertAtIndex As Integer = -1)
+
+        If insertAtIndex >= 0 AndAlso insertAtIndex < Me.SeasonPlannerItems.Count Then
+            Me.SeasonPlannerItems.Insert(insertAtIndex, New SeasonItem(seasonItem))
+        Else
+            Me.SeasonPlannerItems.Add(New SeasonItem(seasonItem))
+        End If
+
         EnsureNoSeasonPlanningDuplicates()
     End Sub
 

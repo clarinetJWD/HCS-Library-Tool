@@ -55,10 +55,28 @@ Public Class ConcertGrid
                 Next
                 e.Handled = True
             Case DragDropActions.Move
-                For Each row In rowsToMove
+                Dim hi = targetView.CalcHitInfo(targetView.GridControl.PointToClient(e.Location))
+                Dim insertLocation = -1
+                If hi.InDataRow AndAlso e.InsertType <> InsertType.AsChild Then
+                    Dim targetRow As SeasonItem = targetView.GetRow(hi.RowHandle)
+                    insertLocation = targetView.DataSource.IndexOf(targetRow)
+                    If e.InsertType <> InsertType.Before Then
+                        insertLocation += 1
+                    End If
+                End If
+
+                For i As Integer = rowsToMove.Count - 1 To 0 Step -1
+                    Dim row = rowsToMove(i)
                     sourceView.DataSource.Remove(row)
-                    targetView.DataSource.Add(row)
+
+                    If insertLocation >= 0 AndAlso insertLocation < targetView.DataRowCount Then
+                        targetView.DataSource.Insert(insertLocation, row)
+                    Else
+                        targetView.DataSource.Add(row)
+                    End If
+                    targetView.FocusedRowHandle = targetView.GetRowHandle(targetView.DataSource.IndexOf(row))
                 Next
+
                 e.Handled = True
         End Select
     End Sub
