@@ -7,6 +7,8 @@ Public Class FtpAndSecurity
     Private Shared _CredentialsEncoded As String = Nothing
 
     Shared Sub New()
+        AddHandler Application.ApplicationExit, AddressOf OnApplicationExit
+
         Dim webClient As New WebClient()
         Try
             Dim encodedCreds As String = webClient.DownloadString("https://joedombrowski.com/apps/hcs-library-tool/data/credentials.enc")
@@ -16,19 +18,28 @@ Public Class FtpAndSecurity
         End Try
     End Sub
 
+    Private Shared Sub OnApplicationExit(sender As Object, e As EventArgs)
+        DisposeClient()
+    End Sub
+
+    Private Shared Sub DisposeClient()
+        If _client IsNot Nothing Then
+            If _client.IsConnected Then
+                _client.Disconnect()
+            End If
+            _client.Dispose()
+        End If
+    End Sub
+
     Friend Shared Function TestPasscode(passcode As String) As Boolean
         Dim connect As FtpClient = Nothing
         Try
             connect = GetFtpConnection(passcode)
             If connect Is Nothing Then Return False
 
-            connect.AutoConnect()
             Return connect.IsAuthenticated
         Catch ex As Exception
             Return False
-        Finally
-            connect?.Disconnect()
-            connect?.Dispose()
         End Try
     End Function
 
@@ -41,10 +52,24 @@ Public Class FtpAndSecurity
 
     Friend Shared Function GetFtpConnection(passcode) As FtpClient
         Try
+            If _client IsNot Nothing AndAlso _client.IsConnected Then
+                Return _client
+            End If
+
             Dim creds = AES.Decrypt(_CredentialsEncoded, PadPasscode(passcode))
-            Return New FtpClient(creds.Split(Chr(31))(0), creds.Split(Chr(31))(1), creds.Split(Chr(31))(2))
+            Dim tempClient = New FtpClient(creds.Split(Chr(31))(0), creds.Split(Chr(31))(1), creds.Split(Chr(31))(2))
+            tempClient.AutoConnect()
+            If tempClient.IsConnected Then
+                DisposeClient()
+                __client = tempClient
+            End If
+            Return _client
         Catch ex As Exception
             Return Nothing
         End Try
+
     End Function
+
+    Private Shared ReadOnly Property _client As FtpClient
+
 End Class

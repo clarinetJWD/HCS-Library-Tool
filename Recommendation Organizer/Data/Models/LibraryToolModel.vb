@@ -1,6 +1,4 @@
 ﻿Imports System.ComponentModel
-Imports System.ComponentModel.DataAnnotations
-Imports System.Net
 Imports FluentFTP
 
 Public Class LibraryToolModel : Implements INotifyPropertyChanged
@@ -55,35 +53,9 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
             Dim newLibraryData As LibraryData = Await Task.Run(
                 Function()
-                    Dim client As FtpClient = Nothing
-                    Try
-                        RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
-                                                               .IsMarquee = True,
-                                                               .Caption = "Loading Library..."})
+                    success = FtpDownloadFile(LocalPath_Library, FtpPath_Library, True, "Loading Library...", 5)
 
-                        client = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-                        client.AutoConnect()
-                        If client.FileExists(FtpPath_Library) Then
-                            Dim dlStatus = client.DownloadFile(
-                                LocalPath_Library, FtpPath_Library, FtpLocalExists.Overwrite, FtpVerify.Retry,
-                                Sub(prg As FtpProgress)
-                                    RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
-                                                               .Minimum = 0,
-                                                               .Maximum = 100,
-                                                               .Value = prg.Progress,
-                                                               .Caption = "Loading Library..."})
-                                End Sub)
-                            success = (dlStatus = FtpStatus.Success)
-                        End If
-                    Catch ex As Exception
-                        ' TODO Log
-                        success = False
-                    Finally
-                        client?.Disconnect()
-                        client?.Dispose()
-                    End Try
-
-                    Dim newLibraryDataInternal As LibraryData
+                    Dim newLibraryDataInternal As LibraryData = Nothing
 
                     If success Then
                         If IO.File.Exists(LocalPath_Library) Then
@@ -186,7 +158,6 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
     Friend Async Function SaveLibrary(libraryData As LibraryData) As Task(Of Boolean)
 
-        Dim client As FtpClient
         Try
             Dim prevLibDate As Date = libraryData.LastChanged
             libraryData.LastChanged = Now
@@ -211,35 +182,23 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                     End Using
 
                     ' Check if server file is newer than your file.
-                    client = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-                    client.AutoConnect()
+                    Dim success = FtpDownloadFile(LocalPath_Library_Temp("temp"), FtpPath_Library, True, "Saving Library...", 5)
 
-                    Dim dlStatus = client.DownloadFile(LocalPath_Library_Temp("temp"), FtpPath_Library, FtpLocalExists.Overwrite, FtpVerify.Retry,
-                                                       Sub(prg As FtpProgress)
-                                                           RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
-                                                                .Minimum = 0,
-                                                                .Maximum = 100,
-                                                                .Value = prg.Progress / 2.0,
-                                                                .Caption = "Saving Library..."})
-                                                       End Sub)
-
-                    If dlStatus = FtpStatus.Success Then
+                    If success Then
                         Using fs As New IO.FileStream(LocalPath_Library_Temp("temp"), IO.FileMode.Open)
                             Dim tmpLib As LibraryData = ser.Deserialize(fs)
                             If tmpLib.LastChanged <= prevLibDate Then
-                                Dim moveStat = client.MoveFile(FtpPath_Library, FtpPath_Library_Temp(Now.ToString("yyyyMMddHHmmssfff")))
-                                If Not moveStat Then
+
+                                Dim libBackupSuccess = True
+                                If FtpFileExists(FtpPath_Library) Then
+                                    libBackupSuccess = FtpMoveFile(FtpPath_Library, FtpPath_Library_Temp(Now.ToString("yyyyMMddHHmmssfff")))
+                                End If
+
+                                If Not libBackupSuccess Then
                                     uploadFailedCode = ErrorCodeEventArgs.ErrorCodes.SaveLibraryFailedBecauseRemoteFileCouldNotBeReplaced
                                     uploadFailedShowMode = ErrorCodeEventArgs.ShowModes.StatusBar
                                 Else
-                                    Dim upStat = client.UploadFile(LocalPath_Library, FtpPath_Library,,, FtpVerify.Retry,
-                                                                   Sub(prg As FtpProgress)
-                                                                       RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
-                                                                           .Minimum = 0,
-                                                                           .Maximum = 100,
-                                                                           .Value = 50.0 + (prg.Progress / 2.0),
-                                                                           .Caption = "Uploading Library..."})
-                                                                   End Sub)
+                                    Dim upStat = FtpUploadFile(LocalPath_Library, FtpPath_Library, True, "Uploading Library...", 5)
 
                                     If upStat <> FtpStatus.Success Then
                                         uploadFailedCode = ErrorCodeEventArgs.ErrorCodes.SaveLibraryFailedBecauseFileCouldNotBeUploaded
@@ -268,8 +227,6 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {.ErrorCode = ErrorCodeEventArgs.ErrorCodes.SaveLibraryFailedForAnUnknownReason, .ShowMode = ErrorCodeEventArgs.ShowModes.StatusBar})
             Return False
         Finally
-            If client IsNot Nothing Then client.Disconnect()
-            If client IsNot Nothing Then client.Dispose()
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
                                                        .Visible = False})
         End Try
@@ -520,7 +477,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
     Private Sub OnLoadSeasonPlanningIndexesTimerElapsed() Handles _timerSeasonPlannerIndexes.Elapsed
         LoadSeasonPlanningIndexes()
     End Sub
-    Private Function LoadSeasonPlanningIndexes(Optional ftpClient As FtpClient = Nothing) As Boolean
+    Private Function LoadSeasonPlanningIndexes() As Boolean
         Dim shouldStartTimer As Boolean = _timerSeasonPlannerIndexes.Enabled
         _timerSeasonPlannerIndexes.Stop()
 
@@ -528,28 +485,13 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         Dim success As Boolean = True
 
         Try
-            Dim client As FtpClient = Nothing
             Try
-                If ftpClient IsNot Nothing Then
-                    client = ftpClient
-                Else
-                    client = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-                    client.AutoConnect()
-                End If
+                If CheckNeedsPublishedSeasonsUpdate() Then
+                    If FtpFileExists(FtpPath_PublishedSeasons) Then
+                        success = FtpDownloadFile(LocalPath_PublishedSeasons, FtpPath_PublishedSeasons, True, "Updating Published Seasons...", 5)
 
-                If CheckNeedsPublishedSeasonsUpdate(client) Then
-                    If client.FileExists(FtpPath_PublishedSeasons) Then
-                        RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {
-                                                   .Caption = "Updating Published Seasons...",
-                                                   .Minimum = 0, .Maximum = 100, .Value = 0})
-
-                        Dim dlStatus = client.DownloadFile(LocalPath_PublishedSeasons, FtpPath_PublishedSeasons, FtpLocalExists.Overwrite, FtpVerify.Retry,
-                                                                   Sub(prg As FtpProgress)
-                                                                       RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Value = prg.Progress})
-                                                                   End Sub)
-                        success = (dlStatus = FtpStatus.Success)
                         If success Then
-                            _PublishedSeasonsIndexUpdatedAt = client.GetModifiedTime(FtpPath_PublishedSeasons)
+                            _PublishedSeasonsIndexUpdatedAt = FtpGetModifiedTime(FtpPath_PublishedSeasons)
                         End If
                         needsUpdate = True
                     End If
@@ -565,11 +507,6 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             Catch ex As Exception
                 ' TODO Log
                 success = False
-            Finally
-                If ftpClient Is Nothing Then
-                    client?.Disconnect()
-                    client?.Dispose()
-                End If
             End Try
 
             If success Then
@@ -606,36 +543,24 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         End Try
     End Function
 
-    Private Function CheckNeedsPublishedSeasonsUpdate(client As FtpClient) As Boolean
+    Private Function CheckNeedsPublishedSeasonsUpdate() As Boolean
         If _PublishedSeasonsIndexUpdatedAt = Date.MinValue Then Return True
 
-        If client.FileExists(FtpPath_PublishedSeasons) Then
-            Return client.GetModifiedTime(FtpPath_PublishedSeasons) > _PublishedSeasonsIndexUpdatedAt
+        If FtpFileExists(FtpPath_PublishedSeasons) Then
+            Return FtpGetModifiedTime(FtpPath_PublishedSeasons) > _PublishedSeasonsIndexUpdatedAt
         Else
             Return False
         End If
     End Function
 
     Friend Function ReplaceWorkingSeasonFromIndex(publishedSeasonIndex As PublishedSeasonIndex) As Boolean
-        Dim client As FtpClient = Nothing
         Try
-            RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Loading Season Data...", .IsMarquee = True})
-
-            client = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-            client.AutoConnect()
-
             Dim fileName = IO.Path.GetFileName(publishedSeasonIndex.ftpPath)
 
-            If client.FileExists(publishedSeasonIndex.ftpPath) Then
-                Dim dlStatus = client.DownloadFile(fileName, publishedSeasonIndex.ftpPath,, FtpVerify.Retry,
-                                              Sub(prg)
-                                                  RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {
-                                                                             .Minimum = 0,
-                                                                             .Maximum = 100,
-                                                                             .Value = prg.Progress})
-                                              End Sub)
+            If FtpFileExists(publishedSeasonIndex.ftpPath) Then
+                Dim success = FtpDownloadFile(fileName, publishedSeasonIndex.ftpPath, True, "Loading Season Data...", 5)
 
-                If Not dlStatus = FtpStatus.Success Then
+                If Not success Then
                     RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
                                             .ErrorCode = ErrorCodeEventArgs.ErrorCodes.LoadSeasonProposalFromIndexFailedBecauseTheFileFailedToDownload})
                     Return False
@@ -669,9 +594,6 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                                     .ErrorCode = ErrorCodeEventArgs.ErrorCodes.LoadSeasonProposalFromIndexFailedUnknownReason})
             Return False
         Finally
-            client?.Disconnect()
-            client?.Dispose()
-
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Visible = False})
         End Try
     End Function
@@ -684,15 +606,11 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         Dim shouldStartTimer As Boolean = _timerSeasonPlannerIndexes.Enabled
         _timerSeasonPlannerIndexes.Stop()
 
-        Dim client As FtpClient = Nothing
         Try
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Saving Season Data...", .IsMarquee = True})
 
-            client = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-            client.AutoConnect()
-
-            If CheckNeedsPublishedSeasonsUpdate(client) Then
-                LoadSeasonPlanningIndexes(client)
+            If CheckNeedsPublishedSeasonsUpdate() Then
+                LoadSeasonPlanningIndexes()
             End If
 
             Dim foundIndex = PublishedSeasonIndexes.ToList.Find(Function(x) x.Name.ToUpper.Trim = publishedSeasonIndex.Name.ToUpper.Trim)
@@ -709,17 +627,9 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                 ser.Serialize(fs, infos)
             End Using
 
-            RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Uploading Season Data...", .IsMarquee = True})
+            Dim dlSuccess = FtpUploadFile(fileName, publishedSeasonIndex.ftpPath, True, "Uploading Season Data...", 5)
 
-            Dim dlStatus = client.UploadFile(fileName, publishedSeasonIndex.ftpPath,, True, FtpVerify.Retry,
-                                              Sub(prg)
-                                                  RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {
-                                                                             .Minimum = 0,
-                                                                             .Maximum = 100,
-                                                                             .Value = prg.Progress})
-                                              End Sub)
-
-            If Not dlStatus = FtpStatus.Success Then
+            If Not dlSuccess Then
                 RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
                                          .ErrorCode = ErrorCodeEventArgs.ErrorCodes.PublishSeasonProposalFailedBecauseTheFileFailedToUpload})
                 Return False
@@ -727,7 +637,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
             publishedSeasonIndex.LastModified = Now
 
-            If Not SaveSeasonIndexes(client, PublishedSeasonIndexes) Then
+            If Not SaveSeasonIndexes(PublishedSeasonIndexes) Then
                 RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
                                          .ErrorCode = ErrorCodeEventArgs.ErrorCodes.PublishSeasonProposalFailedBecauseTheTableOfContentsFailedToUpload})
                 Return False
@@ -739,9 +649,6 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                                      .ErrorCode = ErrorCodeEventArgs.ErrorCodes.PublishSeasonProposalFailedUnknownReason})
             Return False
         Finally
-            client?.Disconnect()
-            client?.Dispose()
-
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Visible = False})
             RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(PublishedSeasonIndexes)))
 
@@ -754,15 +661,11 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         Dim shouldStartTimer As Boolean = _timerSeasonPlannerIndexes.Enabled
         _timerSeasonPlannerIndexes.Stop()
 
-        Dim client As FtpClient = Nothing
         Try
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Deleting Season...", .IsMarquee = True})
 
-            client = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-            client.AutoConnect()
-
-            If CheckNeedsPublishedSeasonsUpdate(client) Then
-                LoadSeasonPlanningIndexes(client)
+            If CheckNeedsPublishedSeasonsUpdate() Then
+                LoadSeasonPlanningIndexes()
             End If
 
             Dim foundIndex = PublishedSeasonIndexes.ToList.Find(Function(x) x.Name.ToUpper.Trim = publishedSeasonIndex.Name.ToUpper.Trim)
@@ -772,7 +675,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
             publishedSeasonIndex.IsDeleted = True
 
-            If Not SaveSeasonIndexes(client, PublishedSeasonIndexes) Then
+            If Not SaveSeasonIndexes(PublishedSeasonIndexes) Then
                 RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
                                          .ErrorCode = ErrorCodeEventArgs.ErrorCodes.DeleteSeasonProposalFailedBecauseTheTableOfContentsFailedToUpload})
                 Return False
@@ -784,9 +687,6 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                                      .ErrorCode = ErrorCodeEventArgs.ErrorCodes.DeleteSeasonProposalFailedUnknownReason})
             Return False
         Finally
-            client?.Disconnect()
-            client?.Dispose()
-
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Visible = False})
             RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(PublishedSeasonIndexes)))
 
@@ -978,7 +878,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         End Try
     End Function
 
-    Private Function SaveSeasonIndexes(client As FtpClient, publishedSeasonIndexes As PublishedSeasonIndexes) As Boolean
+    Private Function SaveSeasonIndexes(publishedSeasonIndexes As PublishedSeasonIndexes) As Boolean
         Dim shouldStartTimer As Boolean = _timerSeasonPlannerIndexes.Enabled
         _timerSeasonPlannerIndexes.Stop()
 
@@ -991,18 +891,9 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                 ser.Serialize(fs, publishedSeasonIndexes)
             End Using
 
-            RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Uploading Season Table of Contents...", .Minimum = 0, .Maximum = 100, .Value = 0})
+            Dim success = FtpUploadFile(LocalPath_PublishedSeasons, FtpPath_PublishedSeasons, True, "Uploading Season Table of Contents...", 5)
+            Return success
 
-            Dim dlStatus = client.UploadFile(LocalPath_PublishedSeasons, FtpPath_PublishedSeasons,,, FtpVerify.Retry,
-                                              Sub(prg)
-                                                  RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Value = prg.Progress})
-                                              End Sub)
-
-            If Not dlStatus = FtpStatus.Success Then
-                Return False
-            End If
-
-            Return True
         Catch ex As Exception
             Return False
         Finally
@@ -1090,6 +981,134 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         End If
 
     End Sub
+
+#End Region
+
+#Region "FTP"
+
+    Private Function FtpDownloadFile(localPath As String, remotePath As String, useProgress As Boolean, progressCaption As String, numRetries As Integer) As Boolean
+        Try
+            If useProgress Then
+                RaiseEvent ProgressChanged(
+                    Me,
+                    New ProgressBarEventArgs With {
+                        .IsMarquee = True,
+                        .Caption = progressCaption})
+            End If
+
+            Do
+                Try
+                    Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
+                    If client.FileExists(remotePath) Then
+                        Dim dlStatus = client.DownloadFile(
+                        localPath, remotePath, FtpLocalExists.Overwrite, FtpVerify.Retry,
+                        Sub(prg As FtpProgress)
+                            If useProgress Then
+                                RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
+                                                       .Minimum = 0,
+                                                       .Maximum = 100,
+                                                       .Value = prg.Progress,
+                                                       .Caption = progressCaption})
+                            End If
+
+                        End Sub)
+                        Return (dlStatus = FtpStatus.Success)
+                    End If
+                Catch ex As Exception
+                    ' TODO Log
+                End Try
+
+                numRetries -= 1
+            Loop While numRetries > 0
+
+            Return False
+        Finally
+            If useProgress Then
+                RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
+                                                       .Visible = False})
+            End If
+        End Try
+
+    End Function
+
+    Private Function FtpUploadFile(localPath As String, remotePath As String, useProgress As Boolean, progressCaption As String, numRetries As Integer) As Boolean
+        Try
+            If useProgress Then
+                RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
+                                                                   .IsMarquee = True,
+                                                                   .Caption = progressCaption})
+            End If
+
+            Do
+                Try
+                    Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
+                    If IO.File.Exists(localPath) Then
+
+
+                        Dim upStatus = client.UploadFile(localPath, remotePath,, True, FtpVerify.Retry,
+                                                                   Sub(prg As FtpProgress)
+                                                                       If useProgress Then
+                                                                           RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
+                                                                               .Minimum = 0,
+                                                                               .Maximum = 100,
+                                                                               .Value = prg.Progress,
+                                                                               .Caption = progressCaption})
+                                                                       End If
+                                                                   End Sub)
+
+                        Return (upStatus = FtpStatus.Success)
+                    End If
+                Catch ex As Exception
+                    ' TODO Log
+                End Try
+
+                numRetries -= 1
+            Loop While numRetries > 0
+
+            Return False
+        Finally
+            If useProgress Then
+                RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
+                                                       .Visible = False})
+            End If
+        End Try
+    End Function
+
+    Private Function FtpMoveFile(oldPath As String, newPath As String) As Boolean
+
+        Try
+            Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
+            If client.FileExists(oldPath) Then
+                Return client.MoveFile(oldPath, newPath)
+            End If
+        Catch ex As Exception
+            ' TODO Log
+        End Try
+
+        Return False
+    End Function
+
+    Private Function FtpFileExists(path As String) As Boolean
+        Try
+            Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
+            Return client.FileExists(path)
+        Catch ex As Exception
+            ' TODO Log
+        End Try
+
+        Return False
+    End Function
+
+    Private Function FtpGetModifiedTime(path As String) As Date
+        Try
+            Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
+            Return client.GetModifiedTime(path)
+        Catch ex As Exception
+            ' TODO Log
+        End Try
+
+        Return Date.MinValue
+    End Function
 
 #End Region
 
