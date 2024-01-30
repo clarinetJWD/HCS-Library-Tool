@@ -37,6 +37,10 @@ Public Class Eras : Inherits BindingList(Of Era) : Implements ISupportHasChanges
         Return String.Join(", ", eraList.FindAll(Function(x) x <> Nothing))
     End Function
 
+    Friend Function GetErasTokenString() As String
+        Return String.Join(", ", Me.ToList.Select(Function(x) If(x?.Name, String.Empty)).ToList.FindAll(Function(x) x <> Nothing))
+    End Function
+
     Friend Function Find(item As Era) As Era
         If item Is Nothing Then Return Nothing
 

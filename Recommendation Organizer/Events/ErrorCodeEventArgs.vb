@@ -21,6 +21,7 @@
         DeleteSeasonProposalFailedUnknownReason
         CouldNotLoadUserSeasonPlanningList
         CouldNotSaveUserSeasonPlanningList
+        CouldNotCreateNewUserWorkingSeasonData
         CouldNotLoadUserWorkingSeasonData
         CouldNotSaveUserWorkingSeasonData
         LibraryFailedToLoadFromServer

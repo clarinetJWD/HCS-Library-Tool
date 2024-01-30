@@ -183,7 +183,7 @@ Public Class ConcertGrid
     End Sub
 
     Private Sub SetEras()
-        Dim eraString = Me._ConcertInformation.GetErasTokenString()
+        Dim eraString = Me._ConcertInformation.Eras.GetErasTokenString()
         If eraString Is Nothing OrElse eraString.Trim = Nothing Then
             LayoutControlItemEras.Visibility = DevExpress.XtraLayout.Utils.LayoutVisibility.Never
         Else
@@ -194,7 +194,7 @@ Public Class ConcertGrid
     End Sub
 
     Private Sub SetTags()
-        Dim tagsString = Me._ConcertInformation.GetTagsTokenString()
+        Dim tagsString = Me._ConcertInformation.Tags.GetTagsTokenString()
         If tagsString Is Nothing OrElse tagsString.Trim = Nothing Then
             LayoutControlItemTags.Visibility = DevExpress.XtraLayout.Utils.LayoutVisibility.Never
         Else

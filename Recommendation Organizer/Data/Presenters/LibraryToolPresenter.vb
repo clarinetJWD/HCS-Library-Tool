@@ -453,6 +453,15 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
         End Try
     End Function
 
+    Friend Function NewWorkingSeasonInformation() As Boolean
+        Try
+            IsAllowedClose = False
+            Return _Model.NewWorkingSeasonInformation()
+        Finally
+            IsAllowedClose = True
+        End Try
+    End Function
+
     Friend Function ReplaceWorkingSeasonFromIndex(index As PublishedSeasonIndex) As Boolean
         Try
             IsAllowedClose = False
@@ -493,6 +502,15 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
         Try
             IsAllowedClose = False
             _Model.CopyCurrentSeasonItemsToPlanningList()
+        Finally
+            IsAllowedClose = True
+        End Try
+    End Sub
+
+    Friend Sub ClearSeasonPlanningList()
+        Try
+            IsAllowedClose = False
+            _Model.ClearSeasonPlanningList()
         Finally
             IsAllowedClose = True
         End Try

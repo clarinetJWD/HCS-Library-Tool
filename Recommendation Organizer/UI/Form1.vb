@@ -169,6 +169,12 @@ Public Class Form1 : Implements INotifyPropertyChanged
         _Presenter.CopyCurrentSeasonItemsToPlanningList()
     End Sub
 
+    Private Sub BarButtonItemClearSeasonPlanner_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemClearSeasonPlanner.ItemClick
+        If DevExpress.XtraEditors.XtraMessageBox.Show("Are you sure you wish to clear all items from the Season Planning List?", "Clear Season Planning List", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+            _Presenter.ClearSeasonPlanningList()
+        End If
+    End Sub
+
     Private Sub OnShortcutItemClick(sender As Object, e As ShortcutItemClickEventArgs) Handles BarManager1.ShortcutItemClick
 
         Dim anyVisible As Boolean = False
@@ -331,6 +337,17 @@ Public Class Form1 : Implements INotifyPropertyChanged
                           Dim newLink = BarSubItemPublishSeason.AddItem(saveAsNewButton)
                           newLink.BeginGroup = True
                       End Sub, Nothing)
+    End Sub
+
+    Private Sub BarButtonItemNewSeason_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemNewSeason.ItemClick
+        Select Case DevExpress.XtraEditors.XtraMessageBox.Show("Unpublished changes will be lost. Do you wish to continue?", "New Season Proposal", MessageBoxButtons.YesNo)
+            Case DialogResult.Yes
+                _Presenter.NewWorkingSeasonInformation()
+
+            Case DialogResult.No
+                ' Do nothing
+
+        End Select
     End Sub
 
     Private Sub OnLoadPublishedSeasonItemClick(sender As Object, e As ItemClickEventArgs)
@@ -549,15 +566,55 @@ Public Class Form1 : Implements INotifyPropertyChanged
                           Dim concertGrids As New List(Of ConcertGrid) From {ConcertGrid1, ConcertGrid2, ConcertGrid3, ConcertGrid4, ConcertGrid5, ConcertGrid6}
 
                           For i As Integer = 0 To concertGrids.Count - 1
-                              Dim concertInfo = If(_Presenter.WorkingSeasonInformation.WorkingConcertInformations.Count > i, _Presenter.WorkingSeasonInformation.WorkingConcertInformations(i), New ConcertInformation)
+                              If _Presenter.WorkingSeasonInformation.WorkingConcertInformations.Count <= i Then
+                                  _Presenter.WorkingSeasonInformation.WorkingConcertInformations.Add(New ConcertInformation)
+                              End If
+
+                              Dim concertInfo = _Presenter.WorkingSeasonInformation.WorkingConcertInformations(i)
                               concertGrids(i).InitializeInfo(concertInfo, _Presenter.Eras, _Presenter.Tags)
                           Next
 
                           _CurrentlyAppliedSeason = _Presenter.WorkingSeasonInformation.WorkingSeasonIndex
 
+                          Me.TokenEditEras.Properties.DataSource = _Presenter.Eras
+                          Me.TokenEditEras.Properties.DisplayMember = "Name"
+                          Me.TokenEditEras.Properties.ValueMember = "Name"
+                          Me.TokenEditEras.Properties.Separators.Add(";")
+
+                          AddHandler _Presenter.WorkingSeasonInformation.PropertyChanged, AddressOf OnWorkingSeasonInformationPropertyChanged
+                          SetEras()
+
                           ApplyUserGridSettings_Concerts()
                       End Sub, Nothing)
     End Sub
+
+    Private Sub OnWorkingSeasonInformationPropertyChanged(sender As Object, e As PropertyChangedEventArgs)
+        SetEras()
+    End Sub
+
+    Private Sub SetEras()
+        Dim eraString = _Presenter.WorkingSeasonInformation.Eras.GetErasTokenString()
+        If eraString Is Nothing OrElse eraString.Trim = Nothing Then
+            LayoutControlItemSeasonEras.Visibility = DevExpress.XtraLayout.Utils.LayoutVisibility.Never
+        Else
+            LayoutControlItemSeasonEras.Visibility = DevExpress.XtraLayout.Utils.LayoutVisibility.Always
+        End If
+
+        Me.TokenEditEras.EditValue = eraString
+    End Sub
+
+    Private Sub TokenEditEras_CustomDrawTokenBackground(sender As Object, e As DevExpress.XtraEditors.TokenEditCustomDrawTokenBackgroundEventArgs) Handles TokenEditEras.CustomDrawTokenBackground
+        e.Cache.FillRoundedRectangle(Color.FromArgb(40, GetColorForEraDescription(e.Description)), e.Bounds, New DevExpress.Utils.Drawing.CornerRadius(4))
+    End Sub
+
+    Private Function GetColorForEraDescription(era As String) As Color
+        Dim foundEra = _Presenter.Eras.Find(era)
+        If foundEra IsNot Nothing AndAlso foundEra.Color <> Color.Transparent Then
+            Return foundEra.Color
+        End If
+
+        Return Color.Gray
+    End Function
 
     Private Sub UpdateSeasonPlannerItemsDataSources()
         _Context.Post(Sub(state)
@@ -951,6 +1008,10 @@ Public Class Form1 : Implements INotifyPropertyChanged
             Case ErrorCodeEventArgs.ErrorCodes.CouldNotSaveUserSeasonPlanningList
                 messageCaption = "Season Planning Error"
                 messageText = "Could not save user season planning list."
+                buttons = MessageBoxButtons.OK
+            Case ErrorCodeEventArgs.ErrorCodes.CouldNotCreateNewUserWorkingSeasonData
+                messageCaption = "Season Planning Error"
+                messageText = "Could not create new user season concert data."
                 buttons = MessageBoxButtons.OK
             Case ErrorCodeEventArgs.ErrorCodes.CouldNotLoadUserWorkingSeasonData
                 messageCaption = "Season Planning Error"

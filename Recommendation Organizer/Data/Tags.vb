@@ -37,6 +37,10 @@ Public Class Tags : Inherits BindingList(Of Tag) : Implements ISupportHasChanges
         Return String.Join(", ", eraList.FindAll(Function(x) x <> Nothing))
     End Function
 
+    Friend Function GetTagsTokenString() As String
+        Return String.Join(", ", Me.ToList.Select(Function(x) If(x?.Name, String.Empty)).ToList.FindAll(Function(x) x <> Nothing))
+    End Function
+
     Friend Function Find(item As Tag) As Tag
         If item Is Nothing Then Return Nothing
 

@@ -963,6 +963,21 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         End Try
     End Function
 
+    Friend Function NewWorkingSeasonInformation() As Boolean
+        Try
+            Dim localInfos As New LocalConcertInformations() With {.WorkingConcertInformations = New ConcertInformations}
+            Me.WorkingSeasonInformation = localInfos
+
+            Return True
+        Catch ex As Exception
+
+            RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
+                                     .ErrorCode = ErrorCodeEventArgs.ErrorCodes.CouldNotCreateNewUserWorkingSeasonData,
+                                     .ShowMode = ErrorCodeEventArgs.ShowModes.StatusBar})
+            Return False
+        End Try
+    End Function
+
     Private Function SaveSeasonIndexes(client As FtpClient, publishedSeasonIndexes As PublishedSeasonIndexes) As Boolean
         Dim shouldStartTimer As Boolean = _timerSeasonPlannerIndexes.Enabled
         _timerSeasonPlannerIndexes.Stop()
@@ -1007,6 +1022,11 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                 End If
             Next
         Next
+    End Sub
+
+    Friend Sub ClearSeasonPlanningList()
+        Me.HiddenSeasonPlannerItems.Clear()
+        Me.SeasonPlannerItems.Clear()
     End Sub
 
     Private Sub EnsureNoSeasonPlanningDuplicates()

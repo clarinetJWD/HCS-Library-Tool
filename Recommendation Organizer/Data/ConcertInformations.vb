@@ -1,7 +1,29 @@
 ﻿Imports System.ComponentModel
 Imports System.ComponentModel.DataAnnotations
 
-Public Class ConcertInformations : Inherits BindingList(Of ConcertInformation)
+Public Class ConcertInformations : Inherits BindingList(Of ConcertInformation) : Implements INotifyPropertyChanged
+
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    ReadOnly Property Eras As Eras
+        Get
+            Dim returnEras As New Eras
+            For Each concert In Me
+                For Each era In concert.Eras
+                    If returnEras.Find(era) Is Nothing Then
+                        returnEras.Add(era)
+                    End If
+                Next
+            Next
+            Return returnEras
+        End Get
+    End Property
+
+    Private Sub OnListChangedHandler(sender As Object, e As ListChangedEventArgs) Handles Me.ListChanged
+        If e.ListChangedType = ListChangedType.ItemAdded OrElse e.ListChangedType = ListChangedType.ItemDeleted OrElse (e.ListChangedType = ListChangedType.ItemChanged AndAlso e.PropertyDescriptor.Name = NameOf(ConcertInformation.Eras)) Then
+            RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Eras)))
+        End If
+    End Sub
 
 End Class
 
@@ -118,13 +140,5 @@ Public Class ConcertInformation : Implements INotifyPropertyChanged
         RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Eras)))
         RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Tags)))
     End Sub
-
-    Friend Function GetErasTokenString() As String
-        Return String.Join(", ", Me.Eras.ToList.Select(Function(x) If(x?.Name, String.Empty)).ToList.FindAll(Function(x) x <> Nothing))
-    End Function
-
-    Friend Function GetTagsTokenString() As String
-        Return String.Join(", ", Me.Tags.ToList.Select(Function(x) If(x?.Name, String.Empty)).ToList.FindAll(Function(x) x <> Nothing))
-    End Function
 
 End Class

@@ -31,16 +31,20 @@ Partial Class Form1
         Me.BarSubItemFileLibrary = New DevExpress.XtraBars.BarSubItem()
         Me.BarButtonItemSaveAll = New DevExpress.XtraBars.BarButtonItem()
         Me.BarButtonItemImportFromCsv = New DevExpress.XtraBars.BarButtonItem()
+        Me.BarSubItemFileMetadata = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemFileSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemLoadSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemPublishSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemDeleteSeason = New DevExpress.XtraBars.BarSubItem()
+        Me.BarButtonItemNewSeason = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemEditLibrary = New DevExpress.XtraBars.BarSubItem()
         Me.BarButtonItemMergeSelected = New DevExpress.XtraBars.BarButtonItem()
+        Me.BarButtonItemRefreshMetadataAll = New DevExpress.XtraBars.BarButtonItem()
+        Me.BarButtonItemRefreshMetadataSelected = New DevExpress.XtraBars.BarButtonItem()
+        Me.BarSubItemEditMetadata = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemEditSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarButtonItemCopySeasonToPlanningList = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemLayoutMenu = New DevExpress.XtraBars.BarSubItem()
-        Me.BarButtonItemRefreshMetadataAll = New DevExpress.XtraBars.BarButtonItem()
         Me.BarStatus = New DevExpress.XtraBars.Bar()
         Me.BarEditItemProgressBar = New DevExpress.XtraBars.BarEditItem()
         Me.RepositoryItemProgressBar1 = New DevExpress.XtraEditors.Repository.RepositoryItemProgressBar()
@@ -71,6 +75,7 @@ Partial Class Form1
         Me.LayoutControlItemMetadataTagsGrid = New DevExpress.XtraLayout.LayoutControlItem()
         Me.TabNavigationPageSeasonPlanner = New DevExpress.XtraBars.Navigation.TabNavigationPage()
         Me.LayoutControlSeasonPlanner = New DevExpress.XtraLayout.LayoutControl()
+        Me.TokenEditEras = New DevExpress.XtraEditors.TokenEdit()
         Me.ConcertGrid6 = New HcsLibraryTool.ConcertGrid()
         Me.ConcertGrid5 = New HcsLibraryTool.ConcertGrid()
         Me.ConcertGrid4 = New HcsLibraryTool.ConcertGrid()
@@ -96,12 +101,11 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert5 = New DevExpress.XtraLayout.LayoutControlItem()
         Me.LayoutControlGroupSeasonConcert6 = New DevExpress.XtraLayout.LayoutControlGroup()
         Me.LayoutControlItemSeasonConcert6 = New DevExpress.XtraLayout.LayoutControlItem()
+        Me.LayoutControlItemSeasonEras = New DevExpress.XtraLayout.LayoutControlItem()
         Me.DragDropEvents2 = New DevExpress.Utils.DragDrop.DragDropEvents(Me.components)
         Me.DragDropEvents1 = New DevExpress.Utils.DragDrop.DragDropEvents(Me.components)
         Me.BehaviorManager1 = New DevExpress.Utils.Behaviors.BehaviorManager(Me.components)
-        Me.BarSubItemFileMetadata = New DevExpress.XtraBars.BarSubItem()
-        Me.BarSubItemEditMetadata = New DevExpress.XtraBars.BarSubItem()
-        Me.BarButtonItemRefreshMetadataSelected = New DevExpress.XtraBars.BarButtonItem()
+        Me.BarButtonItemClearSeasonPlanner = New DevExpress.XtraBars.BarButtonItem()
         CType(Me.GridControlLibrary, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridViewLibrary, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BarManager1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -129,6 +133,7 @@ Partial Class Form1
         Me.TabNavigationPageSeasonPlanner.SuspendLayout()
         CType(Me.LayoutControlSeasonPlanner, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.LayoutControlSeasonPlanner.SuspendLayout()
+        CType(Me.TokenEditEras.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridControlSeasonPlanner, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridViewSeasonPlanner, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Root, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -148,6 +153,7 @@ Partial Class Form1
         CType(Me.LayoutControlItemSeasonConcert5, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LayoutControlGroupSeasonConcert6, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LayoutControlItemSeasonConcert6, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.LayoutControlItemSeasonEras, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BehaviorManager1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -179,9 +185,9 @@ Partial Class Form1
         Me.BarManager1.DockControls.Add(Me.barDockControlLeft)
         Me.BarManager1.DockControls.Add(Me.barDockControlRight)
         Me.BarManager1.Form = Me
-        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibrary, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarButtonItemCopySeasonToPlanningList, Me.BarSubItemDeleteSeason, Me.BarButtonItemRefreshMetadataAll, Me.BarSubItemFileMetadata, Me.BarSubItemEditMetadata, Me.BarButtonItemRefreshMetadataSelected})
+        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibrary, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarButtonItemCopySeasonToPlanningList, Me.BarSubItemDeleteSeason, Me.BarButtonItemRefreshMetadataAll, Me.BarSubItemFileMetadata, Me.BarSubItemEditMetadata, Me.BarButtonItemRefreshMetadataSelected, Me.BarButtonItemNewSeason, Me.BarButtonItemClearSeasonPlanner})
         Me.BarManager1.MainMenu = Me.BarMainMenu
-        Me.BarManager1.MaxItemId = 24
+        Me.BarManager1.MaxItemId = 26
         Me.BarManager1.RepositoryItems.AddRange(New DevExpress.XtraEditors.Repository.RepositoryItem() {Me.RepositoryItemProgressBar1, Me.RepositoryItemMarqueeProgressBar1})
         Me.BarManager1.StatusBar = Me.BarStatus
         '
@@ -221,11 +227,18 @@ Partial Class Form1
         Me.BarButtonItemImportFromCsv.ItemShortcut = New DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.O))
         Me.BarButtonItemImportFromCsv.Name = "BarButtonItemImportFromCsv"
         '
+        'BarSubItemFileMetadata
+        '
+        Me.BarSubItemFileMetadata.Caption = "File"
+        Me.BarSubItemFileMetadata.Id = 20
+        Me.BarSubItemFileMetadata.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemSaveAll)})
+        Me.BarSubItemFileMetadata.Name = "BarSubItemFileMetadata"
+        '
         'BarSubItemFileSeason
         '
         Me.BarSubItemFileSeason.Caption = "File"
         Me.BarSubItemFileSeason.Id = 9
-        Me.BarSubItemFileSeason.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemSaveAll), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemLoadSeason, True), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemPublishSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemDeleteSeason)})
+        Me.BarSubItemFileSeason.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemSaveAll), New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemNewSeason, True), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemLoadSeason, True), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemPublishSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemDeleteSeason)})
         Me.BarSubItemFileSeason.Name = "BarSubItemFileSeason"
         Me.BarSubItemFileSeason.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
         '
@@ -247,6 +260,12 @@ Partial Class Form1
         Me.BarSubItemDeleteSeason.Id = 18
         Me.BarSubItemDeleteSeason.Name = "BarSubItemDeleteSeason"
         '
+        'BarButtonItemNewSeason
+        '
+        Me.BarButtonItemNewSeason.Caption = "New Season"
+        Me.BarButtonItemNewSeason.Id = 24
+        Me.BarButtonItemNewSeason.Name = "BarButtonItemNewSeason"
+        '
         'BarSubItemEditLibrary
         '
         Me.BarSubItemEditLibrary.Caption = "Edit"
@@ -261,11 +280,30 @@ Partial Class Form1
         Me.BarButtonItemMergeSelected.ItemShortcut = New DevExpress.XtraBars.BarShortcut(System.Windows.Forms.Keys.F2)
         Me.BarButtonItemMergeSelected.Name = "BarButtonItemMergeSelected"
         '
+        'BarButtonItemRefreshMetadataAll
+        '
+        Me.BarButtonItemRefreshMetadataAll.Caption = "Refresh All Metadata"
+        Me.BarButtonItemRefreshMetadataAll.Id = 19
+        Me.BarButtonItemRefreshMetadataAll.Name = "BarButtonItemRefreshMetadataAll"
+        '
+        'BarButtonItemRefreshMetadataSelected
+        '
+        Me.BarButtonItemRefreshMetadataSelected.Caption = "Refresh Metadata for Selected Item"
+        Me.BarButtonItemRefreshMetadataSelected.Id = 23
+        Me.BarButtonItemRefreshMetadataSelected.Name = "BarButtonItemRefreshMetadataSelected"
+        '
+        'BarSubItemEditMetadata
+        '
+        Me.BarSubItemEditMetadata.Caption = "Edit"
+        Me.BarSubItemEditMetadata.Id = 22
+        Me.BarSubItemEditMetadata.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemMergeSelected)})
+        Me.BarSubItemEditMetadata.Name = "BarSubItemEditMetadata"
+        '
         'BarSubItemEditSeason
         '
         Me.BarSubItemEditSeason.Caption = "Edit"
         Me.BarSubItemEditSeason.Id = 16
-        Me.BarSubItemEditSeason.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemCopySeasonToPlanningList)})
+        Me.BarSubItemEditSeason.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemCopySeasonToPlanningList), New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemClearSeasonPlanner)})
         Me.BarSubItemEditSeason.Name = "BarSubItemEditSeason"
         '
         'BarButtonItemCopySeasonToPlanningList
@@ -281,12 +319,6 @@ Partial Class Form1
         Me.BarSubItemLayoutMenu.Id = 8
         Me.BarSubItemLayoutMenu.Name = "BarSubItemLayoutMenu"
         Me.BarSubItemLayoutMenu.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
-        '
-        'BarButtonItemRefreshMetadataAll
-        '
-        Me.BarButtonItemRefreshMetadataAll.Caption = "Refresh All Metadata"
-        Me.BarButtonItemRefreshMetadataAll.Id = 19
-        Me.BarButtonItemRefreshMetadataAll.Name = "BarButtonItemRefreshMetadataAll"
         '
         'BarStatus
         '
@@ -602,6 +634,7 @@ Partial Class Form1
         'LayoutControlSeasonPlanner
         '
         Me.LayoutControlSeasonPlanner.AllowCustomization = False
+        Me.LayoutControlSeasonPlanner.Controls.Add(Me.TokenEditEras)
         Me.LayoutControlSeasonPlanner.Controls.Add(Me.ConcertGrid6)
         Me.LayoutControlSeasonPlanner.Controls.Add(Me.ConcertGrid5)
         Me.LayoutControlSeasonPlanner.Controls.Add(Me.ConcertGrid4)
@@ -614,54 +647,68 @@ Partial Class Form1
         Me.LayoutControlSeasonPlanner.Name = "LayoutControlSeasonPlanner"
         Me.LayoutControlSeasonPlanner.OptionsCustomizationForm.DesignTimeCustomizationFormPositionAndSize = New System.Drawing.Rectangle(3462, 418, 650, 400)
         Me.LayoutControlSeasonPlanner.Root = Me.Root
-        Me.LayoutControlSeasonPlanner.Size = New System.Drawing.Size(1206, 861)
+        Me.LayoutControlSeasonPlanner.Size = New System.Drawing.Size(804, 574)
         Me.LayoutControlSeasonPlanner.TabIndex = 2
+        '
+        'TokenEditEras
+        '
+        Me.TokenEditEras.Location = New System.Drawing.Point(238, 31)
+        Me.TokenEditEras.Name = "TokenEditEras"
+        Me.TokenEditEras.Properties.AutoHeightMode = DevExpress.XtraEditors.TokenEditAutoHeightMode.Expand
+        Me.TokenEditEras.Properties.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
+        Me.TokenEditEras.Properties.ReadOnly = True
+        Me.TokenEditEras.Properties.Separators.AddRange(New String() {","})
+        Me.TokenEditEras.Properties.ShowDropDown = False
+        Me.TokenEditEras.Properties.ShowTokenGlyph = False
+        Me.TokenEditEras.Size = New System.Drawing.Size(272, 18)
+        Me.TokenEditEras.StyleController = Me.LayoutControlSeasonPlanner
+        Me.TokenEditEras.TabIndex = 11
         '
         'ConcertGrid6
         '
-        Me.ConcertGrid6.Location = New System.Drawing.Point(809, 584)
+        Me.ConcertGrid6.Location = New System.Drawing.Point(353, 289)
         Me.ConcertGrid6.Name = "ConcertGrid6"
-        Me.ConcertGrid6.Size = New System.Drawing.Size(376, 256)
+        Me.ConcertGrid6.Size = New System.Drawing.Size(157, 113)
         Me.ConcertGrid6.TabIndex = 10
         Me.ConcertGrid6.Title = "Concert 6"
         '
         'ConcertGrid5
         '
-        Me.ConcertGrid5.Location = New System.Drawing.Point(809, 315)
+        Me.ConcertGrid5.Location = New System.Drawing.Point(353, 169)
         Me.ConcertGrid5.Name = "ConcertGrid5"
-        Me.ConcertGrid5.Size = New System.Drawing.Size(376, 259)
+        Me.ConcertGrid5.Size = New System.Drawing.Size(157, 113)
         Me.ConcertGrid5.TabIndex = 9
         Me.ConcertGrid5.Title = "Concert 5"
         '
         'ConcertGrid4
         '
-        Me.ConcertGrid4.Location = New System.Drawing.Point(809, 46)
+        Me.ConcertGrid4.Location = New System.Drawing.Point(353, 49)
         Me.ConcertGrid4.Name = "ConcertGrid4"
-        Me.ConcertGrid4.Size = New System.Drawing.Size(376, 259)
+        Me.ConcertGrid4.Size = New System.Drawing.Size(157, 113)
         Me.ConcertGrid4.TabIndex = 8
         Me.ConcertGrid4.Title = "Concert 4"
         '
         'ConcertGrid3
         '
-        Me.ConcertGrid3.Location = New System.Drawing.Point(424, 584)
+        Me.ConcertGrid3.Location = New System.Drawing.Point(190, 289)
         Me.ConcertGrid3.Name = "ConcertGrid3"
-        Me.ConcertGrid3.Size = New System.Drawing.Size(375, 256)
+        Me.ConcertGrid3.Size = New System.Drawing.Size(157, 113)
         Me.ConcertGrid3.TabIndex = 7
         Me.ConcertGrid3.Title = "Concert 3"
         '
         'ConcertGrid2
         '
-        Me.ConcertGrid2.Location = New System.Drawing.Point(424, 315)
+        Me.ConcertGrid2.Location = New System.Drawing.Point(190, 169)
         Me.ConcertGrid2.Name = "ConcertGrid2"
-        Me.ConcertGrid2.Size = New System.Drawing.Size(375, 259)
+        Me.ConcertGrid2.Size = New System.Drawing.Size(157, 113)
         Me.ConcertGrid2.TabIndex = 6
         Me.ConcertGrid2.Title = "Concert 2"
         '
         'ConcertGrid1
         '
-        Me.ConcertGrid1.Location = New System.Drawing.Point(424, 46)
+        Me.ConcertGrid1.Location = New System.Drawing.Point(190, 49)
         Me.ConcertGrid1.Name = "ConcertGrid1"
-        Me.ConcertGrid1.Size = New System.Drawing.Size(375, 259)
+        Me.ConcertGrid1.Size = New System.Drawing.Size(157, 113)
         Me.ConcertGrid1.TabIndex = 5
         Me.ConcertGrid1.Title = "Concert 1"
         '
@@ -670,7 +717,7 @@ Partial Class Form1
         Me.GridControlSeasonPlanner.Location = New System.Drawing.Point(13, 38)
         Me.GridControlSeasonPlanner.MainView = Me.GridViewSeasonPlanner
         Me.GridControlSeasonPlanner.Name = "GridControlSeasonPlanner"
-        Me.GridControlSeasonPlanner.Size = New System.Drawing.Size(387, 810)
+        Me.GridControlSeasonPlanner.Size = New System.Drawing.Size(165, 382)
         Me.GridControlSeasonPlanner.TabIndex = 1
         Me.GridControlSeasonPlanner.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewSeasonPlanner})
         '
@@ -691,7 +738,7 @@ Partial Class Form1
         Me.Root.GroupBordersVisible = False
         Me.Root.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlGroupSeasonPlanningList, Me.SplitterItemSeasonPlanner, Me.LayoutControlGroupProposedSeason})
         Me.Root.Name = "Root"
-        Me.Root.Size = New System.Drawing.Size(1206, 861)
+        Me.Root.Size = New System.Drawing.Size(787, 624)
         Me.Root.TextVisible = False
         '
         'LayoutControlGroupSeasonPlanningList
@@ -700,7 +747,7 @@ Partial Class Form1
         Me.LayoutControlGroupSeasonPlanningList.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlGroupSeasonPlanningList.Name = "LayoutControlGroupSeasonPlanningList"
         Me.LayoutControlGroupSeasonPlanningList.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonPlanningList.Size = New System.Drawing.Size(393, 841)
+        Me.LayoutControlGroupSeasonPlanningList.Size = New System.Drawing.Size(254, 604)
         Me.LayoutControlGroupSeasonPlanningList.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
         Me.LayoutControlGroupSeasonPlanningList.Text = "Season Planner List"
         '
@@ -709,23 +756,23 @@ Partial Class Form1
         Me.LayoutControlItemSeasonPlannerGrid.Control = Me.GridControlSeasonPlanner
         Me.LayoutControlItemSeasonPlannerGrid.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonPlannerGrid.Name = "LayoutControlItemSeasonPlannerGrid"
-        Me.LayoutControlItemSeasonPlannerGrid.Size = New System.Drawing.Size(391, 814)
+        Me.LayoutControlItemSeasonPlannerGrid.Size = New System.Drawing.Size(252, 577)
         Me.LayoutControlItemSeasonPlannerGrid.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonPlannerGrid.TextVisible = False
         '
         'SplitterItemSeasonPlanner
         '
         Me.SplitterItemSeasonPlanner.AllowHotTrack = True
-        Me.SplitterItemSeasonPlanner.Location = New System.Drawing.Point(393, 0)
+        Me.SplitterItemSeasonPlanner.Location = New System.Drawing.Point(254, 0)
         Me.SplitterItemSeasonPlanner.Name = "SplitterItemSeasonPlanner"
-        Me.SplitterItemSeasonPlanner.Size = New System.Drawing.Size(10, 841)
+        Me.SplitterItemSeasonPlanner.Size = New System.Drawing.Size(10, 604)
         '
         'LayoutControlGroupProposedSeason
         '
-        Me.LayoutControlGroupProposedSeason.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlGroupSeasonConcert1, Me.LayoutControlGroupSeasonConcert2, Me.LayoutControlGroupSeasonConcert3, Me.LayoutControlGroupSeasonConcert4, Me.LayoutControlGroupSeasonConcert5, Me.LayoutControlGroupSeasonConcert6})
-        Me.LayoutControlGroupProposedSeason.Location = New System.Drawing.Point(403, 0)
+        Me.LayoutControlGroupProposedSeason.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlGroupSeasonConcert1, Me.LayoutControlGroupSeasonConcert2, Me.LayoutControlGroupSeasonConcert3, Me.LayoutControlGroupSeasonConcert4, Me.LayoutControlGroupSeasonConcert5, Me.LayoutControlGroupSeasonConcert6, Me.LayoutControlItemSeasonEras})
+        Me.LayoutControlGroupProposedSeason.Location = New System.Drawing.Point(264, 0)
         Me.LayoutControlGroupProposedSeason.Name = "LayoutControlGroupProposedSeason"
-        Me.LayoutControlGroupProposedSeason.Size = New System.Drawing.Size(783, 841)
+        Me.LayoutControlGroupProposedSeason.Size = New System.Drawing.Size(503, 604)
         Me.LayoutControlGroupProposedSeason.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
         Me.LayoutControlGroupProposedSeason.Text = "Propsed Season"
         '
@@ -733,10 +780,10 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert1.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert1.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert1})
-        Me.LayoutControlGroupSeasonConcert1.Location = New System.Drawing.Point(0, 0)
+        Me.LayoutControlGroupSeasonConcert1.Location = New System.Drawing.Point(0, 27)
         Me.LayoutControlGroupSeasonConcert1.Name = "LayoutControlGroupSeasonConcert1"
         Me.LayoutControlGroupSeasonConcert1.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert1.Size = New System.Drawing.Size(381, 269)
+        Me.LayoutControlGroupSeasonConcert1.Size = New System.Drawing.Size(241, 180)
         Me.LayoutControlGroupSeasonConcert1.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 4, 0, 8)
         Me.LayoutControlGroupSeasonConcert1.TextVisible = False
         '
@@ -746,7 +793,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert1.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert1.Name = "LayoutControlItemSeasonConcert1"
         Me.LayoutControlItemSeasonConcert1.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert1.Size = New System.Drawing.Size(375, 259)
+        Me.LayoutControlItemSeasonConcert1.Size = New System.Drawing.Size(235, 170)
         Me.LayoutControlItemSeasonConcert1.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert1.TextVisible = False
         '
@@ -754,10 +801,10 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert2.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert2.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert2})
-        Me.LayoutControlGroupSeasonConcert2.Location = New System.Drawing.Point(0, 269)
+        Me.LayoutControlGroupSeasonConcert2.Location = New System.Drawing.Point(0, 207)
         Me.LayoutControlGroupSeasonConcert2.Name = "LayoutControlGroupSeasonConcert2"
         Me.LayoutControlGroupSeasonConcert2.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert2.Size = New System.Drawing.Size(381, 269)
+        Me.LayoutControlGroupSeasonConcert2.Size = New System.Drawing.Size(241, 180)
         Me.LayoutControlGroupSeasonConcert2.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 4, 0, 8)
         Me.LayoutControlGroupSeasonConcert2.TextVisible = False
         '
@@ -767,7 +814,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert2.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert2.Name = "LayoutControlItemSeasonConcert2"
         Me.LayoutControlItemSeasonConcert2.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert2.Size = New System.Drawing.Size(375, 259)
+        Me.LayoutControlItemSeasonConcert2.Size = New System.Drawing.Size(235, 170)
         Me.LayoutControlItemSeasonConcert2.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert2.TextVisible = False
         '
@@ -775,10 +822,10 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert3.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert3.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert3})
-        Me.LayoutControlGroupSeasonConcert3.Location = New System.Drawing.Point(0, 538)
+        Me.LayoutControlGroupSeasonConcert3.Location = New System.Drawing.Point(0, 387)
         Me.LayoutControlGroupSeasonConcert3.Name = "LayoutControlGroupSeasonConcert3"
         Me.LayoutControlGroupSeasonConcert3.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert3.Size = New System.Drawing.Size(381, 258)
+        Me.LayoutControlGroupSeasonConcert3.Size = New System.Drawing.Size(241, 172)
         Me.LayoutControlGroupSeasonConcert3.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 4, 0, 0)
         Me.LayoutControlGroupSeasonConcert3.TextVisible = False
         '
@@ -788,7 +835,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert3.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert3.Name = "LayoutControlItemSeasonConcert3"
         Me.LayoutControlItemSeasonConcert3.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert3.Size = New System.Drawing.Size(375, 256)
+        Me.LayoutControlItemSeasonConcert3.Size = New System.Drawing.Size(235, 170)
         Me.LayoutControlItemSeasonConcert3.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert3.TextVisible = False
         '
@@ -796,10 +843,10 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert4.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert4.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert4})
-        Me.LayoutControlGroupSeasonConcert4.Location = New System.Drawing.Point(381, 0)
+        Me.LayoutControlGroupSeasonConcert4.Location = New System.Drawing.Point(241, 27)
         Me.LayoutControlGroupSeasonConcert4.Name = "LayoutControlGroupSeasonConcert4"
         Me.LayoutControlGroupSeasonConcert4.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert4.Size = New System.Drawing.Size(382, 269)
+        Me.LayoutControlGroupSeasonConcert4.Size = New System.Drawing.Size(242, 180)
         Me.LayoutControlGroupSeasonConcert4.Spacing = New DevExpress.XtraLayout.Utils.Padding(4, 0, 0, 8)
         Me.LayoutControlGroupSeasonConcert4.TextVisible = False
         '
@@ -809,7 +856,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert4.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert4.Name = "LayoutControlItemSeasonConcert4"
         Me.LayoutControlItemSeasonConcert4.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert4.Size = New System.Drawing.Size(376, 259)
+        Me.LayoutControlItemSeasonConcert4.Size = New System.Drawing.Size(236, 170)
         Me.LayoutControlItemSeasonConcert4.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert4.TextVisible = False
         '
@@ -817,10 +864,10 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert5.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert5.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert5})
-        Me.LayoutControlGroupSeasonConcert5.Location = New System.Drawing.Point(381, 269)
+        Me.LayoutControlGroupSeasonConcert5.Location = New System.Drawing.Point(241, 207)
         Me.LayoutControlGroupSeasonConcert5.Name = "LayoutControlGroupSeasonConcert5"
         Me.LayoutControlGroupSeasonConcert5.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert5.Size = New System.Drawing.Size(382, 269)
+        Me.LayoutControlGroupSeasonConcert5.Size = New System.Drawing.Size(242, 180)
         Me.LayoutControlGroupSeasonConcert5.Spacing = New DevExpress.XtraLayout.Utils.Padding(4, 0, 0, 8)
         Me.LayoutControlGroupSeasonConcert5.TextVisible = False
         '
@@ -830,7 +877,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert5.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert5.Name = "LayoutControlItemSeasonConcert5"
         Me.LayoutControlItemSeasonConcert5.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert5.Size = New System.Drawing.Size(376, 259)
+        Me.LayoutControlItemSeasonConcert5.Size = New System.Drawing.Size(236, 170)
         Me.LayoutControlItemSeasonConcert5.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert5.TextVisible = False
         '
@@ -838,10 +885,10 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert6.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert6.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert6})
-        Me.LayoutControlGroupSeasonConcert6.Location = New System.Drawing.Point(381, 538)
+        Me.LayoutControlGroupSeasonConcert6.Location = New System.Drawing.Point(241, 387)
         Me.LayoutControlGroupSeasonConcert6.Name = "LayoutControlGroupSeasonConcert6"
         Me.LayoutControlGroupSeasonConcert6.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert6.Size = New System.Drawing.Size(382, 258)
+        Me.LayoutControlGroupSeasonConcert6.Size = New System.Drawing.Size(242, 172)
         Me.LayoutControlGroupSeasonConcert6.Spacing = New DevExpress.XtraLayout.Utils.Padding(4, 0, 0, 0)
         Me.LayoutControlGroupSeasonConcert6.TextVisible = False
         '
@@ -851,29 +898,25 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert6.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert6.Name = "LayoutControlItemSeasonConcert6"
         Me.LayoutControlItemSeasonConcert6.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert6.Size = New System.Drawing.Size(376, 256)
+        Me.LayoutControlItemSeasonConcert6.Size = New System.Drawing.Size(236, 170)
         Me.LayoutControlItemSeasonConcert6.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert6.TextVisible = False
         '
-        'BarSubItemFileMetadata
+        'LayoutControlItemSeasonEras
         '
-        Me.BarSubItemFileMetadata.Caption = "File"
-        Me.BarSubItemFileMetadata.Id = 20
-        Me.BarSubItemFileMetadata.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemSaveAll)})
-        Me.BarSubItemFileMetadata.Name = "BarSubItemFileMetadata"
+        Me.LayoutControlItemSeasonEras.Control = Me.TokenEditEras
+        Me.LayoutControlItemSeasonEras.Location = New System.Drawing.Point(0, 0)
+        Me.LayoutControlItemSeasonEras.Name = "LayoutControlItemSeasonEras"
+        Me.LayoutControlItemSeasonEras.Size = New System.Drawing.Size(483, 27)
+        Me.LayoutControlItemSeasonEras.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 5)
+        Me.LayoutControlItemSeasonEras.Text = "Season Eras"
+        Me.LayoutControlItemSeasonEras.TextSize = New System.Drawing.Size(59, 13)
         '
-        'BarSubItemEditMetadata
+        'BarButtonItemClearSeasonPlanner
         '
-        Me.BarSubItemEditMetadata.Caption = "Edit"
-        Me.BarSubItemEditMetadata.Id = 22
-        Me.BarSubItemEditMetadata.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemMergeSelected)})
-        Me.BarSubItemEditMetadata.Name = "BarSubItemEditMetadata"
-        '
-        'BarButtonItemRefreshMetadataSelected
-        '
-        Me.BarButtonItemRefreshMetadataSelected.Caption = "Refresh Metadata for Selected Item"
-        Me.BarButtonItemRefreshMetadataSelected.Id = 23
-        Me.BarButtonItemRefreshMetadataSelected.Name = "BarButtonItemRefreshMetadataSelected"
+        Me.BarButtonItemClearSeasonPlanner.Caption = "Clear Season Planner List"
+        Me.BarButtonItemClearSeasonPlanner.Id = 25
+        Me.BarButtonItemClearSeasonPlanner.Name = "BarButtonItemClearSeasonPlanner"
         '
         'Form1
         '
@@ -916,6 +959,7 @@ Partial Class Form1
         Me.TabNavigationPageSeasonPlanner.ResumeLayout(False)
         CType(Me.LayoutControlSeasonPlanner, System.ComponentModel.ISupportInitialize).EndInit()
         Me.LayoutControlSeasonPlanner.ResumeLayout(False)
+        CType(Me.TokenEditEras.Properties, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.GridControlSeasonPlanner, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.GridViewSeasonPlanner, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Root, System.ComponentModel.ISupportInitialize).EndInit()
@@ -935,6 +979,7 @@ Partial Class Form1
         CType(Me.LayoutControlItemSeasonConcert5, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LayoutControlGroupSeasonConcert6, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LayoutControlItemSeasonConcert6, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.LayoutControlItemSeasonEras, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BehaviorManager1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -1019,4 +1064,8 @@ Partial Class Form1
     Friend WithEvents BarSubItemFileMetadata As DevExpress.XtraBars.BarSubItem
     Friend WithEvents BarSubItemEditMetadata As DevExpress.XtraBars.BarSubItem
     Friend WithEvents BarButtonItemRefreshMetadataSelected As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents BarButtonItemNewSeason As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents TokenEditEras As DevExpress.XtraEditors.TokenEdit
+    Friend WithEvents LayoutControlItemSeasonEras As DevExpress.XtraLayout.LayoutControlItem
+    Friend WithEvents BarButtonItemClearSeasonPlanner As DevExpress.XtraBars.BarButtonItem
 End Class
