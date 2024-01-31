@@ -117,45 +117,18 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
     End Function
 
     Friend Sub AddSeasonPlannerItem(seasonItem As Recommendation, Optional insertAtIndex As Integer = -1)
-
-        If insertAtIndex >= 0 AndAlso insertAtIndex < Me.SeasonPlannerItems.Count Then
-            Me.SeasonPlannerItems.Insert(insertAtIndex, New SeasonItem(seasonItem))
-        Else
-            Me.SeasonPlannerItems.Add(New SeasonItem(seasonItem))
-        End If
-
-        EnsureNoSeasonPlanningDuplicates()
+        If Me.WorkingSeasonInformation?.WorkingSeasonInformation?.SeasonPlannerItems Is Nothing Then Exit Sub
+        Me.WorkingSeasonInformation.WorkingSeasonInformation.AddSeasonPlannerItem(seasonItem, insertAtIndex)
     End Sub
 
     Friend Sub RemoveSeasonPlannerItem(recommendation As Recommendation)
-        If SeasonPlannerItems.FindSeasonItem(recommendation) IsNot Nothing Then
-            SeasonPlannerItems.Remove(SeasonPlannerItems.FindSeasonItem(recommendation))
-        Else
-            For Each concertInfo In WorkingSeasonInformation.WorkingConcertInformations
-                Dim foundItem = concertInfo.Compositions.FindSeasonItem(recommendation)
-                If foundItem IsNot Nothing Then
-                    concertInfo.Compositions.Remove(foundItem)
-                    Exit Sub
-                End If
-            Next
-        End If
-        If HiddenSeasonPlannerItems.FindSeasonItem(recommendation) IsNot Nothing Then
-            HiddenSeasonPlannerItems.Remove(HiddenSeasonPlannerItems.FindSeasonItem(recommendation))
-        End If
+        If Me.WorkingSeasonInformation?.WorkingSeasonInformation?.SeasonPlannerItems Is Nothing Then Exit Sub
+        Me.WorkingSeasonInformation.WorkingSeasonInformation.RemoveSeasonPlannerItem(recommendation)
     End Sub
 
     Friend Function GetSeasonPlannerContainsItem(recommendation As Recommendation) As Boolean
-        If SeasonPlannerItems.FindSeasonItem(recommendation) IsNot Nothing Then
-            Return True
-        Else
-            For Each concertInfo In WorkingSeasonInformation.WorkingConcertInformations
-                Dim foundItem = concertInfo.Compositions.FindSeasonItem(recommendation)
-                If foundItem IsNot Nothing Then
-                    Return True
-                End If
-            Next
-        End If
-        Return False
+        If Me.WorkingSeasonInformation?.WorkingSeasonInformation?.SeasonPlannerItems Is Nothing Then Return False
+        Return Me.WorkingSeasonInformation.WorkingSeasonInformation.GetSeasonPlannerContainsItem(recommendation)
     End Function
 
     Friend Async Function SaveLibrary() As Task(Of Boolean)
@@ -206,7 +179,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                                 Else
                                     Dim upStat = FtpUploadFile(LocalPath_Library, FtpPath_Library, True, "Uploading Library...", 5)
 
-                                    If upStat <> FtpStatus.Success Then
+                                    If Not upStat Then
                                         uploadFailedCode = ErrorCodeEventArgs.ErrorCodes.SaveLibraryFailedBecauseFileCouldNotBeUploaded
                                         uploadFailedShowMode = ErrorCodeEventArgs.ShowModes.StatusBar
                                     Else
@@ -242,19 +215,12 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
     Friend Function ReplaceLibraryEntries(itemsToReplace As IEnumerable(Of Recommendation), newItem As Recommendation) As Boolean
         For Each selection In itemsToReplace
             Library.Remove(selection)
-
-            Dim seasonPlannerItem = Me.SeasonPlannerItems.FindSeasonItem(selection)
-            If seasonPlannerItem IsNot Nothing Then seasonPlannerItem.SetRecommendation(newItem, True)
-
-            Dim hiddenSeasonPlannerItem = Me.HiddenSeasonPlannerItems.FindSeasonItem(selection)
-            If hiddenSeasonPlannerItem IsNot Nothing Then hiddenSeasonPlannerItem.SetRecommendation(newItem, True)
-
-            For Each concert In Me.WorkingSeasonInformation.WorkingConcertInformations
-                Dim concertItem = concert.Compositions.FindSeasonItem(selection)
-                If concertItem IsNot Nothing Then concertItem.SetRecommendation(newItem, True)
-            Next
         Next
         Library.Add(newItem)
+
+        If Me.WorkingSeasonInformation?.WorkingSeasonInformation?.SeasonPlannerItems Is Nothing Then Return False
+        Return Me.WorkingSeasonInformation.WorkingSeasonInformation.ReplaceLibraryEntries(itemsToReplace, newItem)
+
         Return True
     End Function
 
@@ -403,12 +369,12 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
     End Property
     Private _PublishedSeasonIndexes As PublishedSeasonIndexes
 
-    Friend Property WorkingSeasonInformation As LocalConcertInformations
+    Friend Property WorkingSeasonInformation As LocalSeasonInformation
         Get
             Return _WorkingSeasonInformation
         End Get
-        Private Set(value As LocalConcertInformations)
-            For Each item In value.WorkingConcertInformations
+        Private Set(value As LocalSeasonInformation)
+            For Each item In value.WorkingSeasonInformation.ConcertInformations
                 For Each comp In item.Compositions
                     Dim foundRec = Library.FindRecommendation(comp)
                     If foundRec IsNot Nothing Then
@@ -419,54 +385,27 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
             _WorkingSeasonInformation = value
 
-            EnsureNoSeasonPlanningDuplicates()
+            value.WorkingSeasonInformation.EnsureNoSeasonPlanningDuplicates()
 
             RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(WorkingSeasonInformation)))
-        End Set
-    End Property
-    Private _WorkingSeasonInformation As LocalConcertInformations
-
-    Friend Property SeasonPlannerItems As SeasonPlanningList
-        Get
-            Return _SeasonPlannerItems
-        End Get
-        Set(value As SeasonPlanningList)
-            For Each item In value
-                Dim foundRec = Library.FindRecommendation(item)
-                If foundRec IsNot Nothing Then
-                    item.SetRecommendation(foundRec, False)
-                End If
-            Next
-
-            _SeasonPlannerItems = value
-
-            EnsureNoSeasonPlanningDuplicates()
-
             RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(SeasonPlannerItems)))
-        End Set
-    End Property
-    Private _SeasonPlannerItems As SeasonPlanningList
-
-    Friend Property HiddenSeasonPlannerItems As SeasonPlanningList
-        Get
-            Return _HiddenSeasonPlannerItems
-        End Get
-        Set(value As SeasonPlanningList)
-            For Each item In value
-                Dim foundRec = Library.FindRecommendation(item)
-                If foundRec IsNot Nothing Then
-                    item.SetRecommendation(foundRec, False)
-                End If
-            Next
-
-            _HiddenSeasonPlannerItems = value
-
-            EnsureNoSeasonPlanningDuplicates()
-
             RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(HiddenSeasonPlannerItems)))
         End Set
     End Property
-    Private _HiddenSeasonPlannerItems As SeasonPlanningList
+    Private _WorkingSeasonInformation As LocalSeasonInformation
+
+    Friend ReadOnly Property SeasonPlannerItems As SeasonPlanningList
+        Get
+            Return Me.WorkingSeasonInformation?.WorkingSeasonInformation?.SeasonPlannerItems
+        End Get
+    End Property
+
+    Friend ReadOnly Property HiddenSeasonPlannerItems As SeasonPlanningList
+        Get
+            Return Me.WorkingSeasonInformation?.WorkingSeasonInformation?.HiddenSeasonPlannerItems
+        End Get
+    End Property
+
 
     Private _PublishedSeasonsIndexUpdatedAt As Date = Date.MinValue
     Private WithEvents _timerSeasonPlannerIndexes As New Timers.Timer(30000)
@@ -573,10 +512,10 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                 End If
 
                 Using fs As New IO.FileStream(fileName, IO.FileMode.Open)
-                    Dim ser As New Xml.Serialization.XmlSerializer(GetType(ConcertInformations))
-                    Dim newSeasonData As ConcertInformations = ser.Deserialize(fs)
+                    Dim ser As New Xml.Serialization.XmlSerializer(GetType(SeasonInformation))
+                    Dim newSeasonData As SeasonInformation = ser.Deserialize(fs)
 
-                    For Each concert In newSeasonData
+                    For Each concert In newSeasonData.ConcertInformations
                         For Each composition In concert.Compositions
                             Dim foundItem = Library.FindRecommendation(composition)
                             If foundItem IsNot Nothing Then
@@ -585,7 +524,17 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                         Next
                     Next
 
-                    Me.WorkingSeasonInformation = New LocalConcertInformations() With {.WorkingConcertInformations = newSeasonData, .WorkingSeasonIndex = publishedSeasonIndex}
+                    For Each itemList In {newSeasonData.SeasonPlannerItems, newSeasonData.HiddenSeasonPlannerItems}
+                        For Each item In itemList
+                            Dim foundRec = Me.Library.FindRecommendation(item)
+                            If foundRec IsNot Nothing Then
+                                item.SetRecommendation(foundRec, False)
+                            End If
+                        Next
+                    Next
+
+                    Dim newSeasonInfo = New LocalSeasonInformation() With {.WorkingSeasonInformation = newSeasonData, .WorkingSeasonIndex = publishedSeasonIndex}
+                    Me.WorkingSeasonInformation = newSeasonInfo
 
                     Return True
                 End Using
@@ -596,19 +545,52 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             End If
 
         Catch ex As Exception
-            RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
+            If ReplaceWorkingSeasonFromIndex_Legacy(publishedSeasonIndex) Then
+                Return True
+            Else
+                RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
                                     .ErrorCode = ErrorCodeEventArgs.ErrorCodes.LoadSeasonProposalFromIndexFailedUnknownReason})
-            Return False
+                Return False
+            End If
         Finally
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Visible = False})
         End Try
     End Function
 
-    Friend Function SaveSeason(publishedSeasonIndex As PublishedSeasonIndex) As Boolean
-        Return SaveSeason(publishedSeasonIndex, Me.WorkingSeasonInformation.WorkingConcertInformations)
+    Private Function ReplaceWorkingSeasonFromIndex_Legacy(publishedSeasonIndex As PublishedSeasonIndex) As Boolean
+        Try
+            Dim fileName = IO.Path.GetFileName(publishedSeasonIndex.ftpPath)
+
+            Using fs As New IO.FileStream(fileName, IO.FileMode.Open)
+                Dim ser As New Xml.Serialization.XmlSerializer(GetType(ConcertInformations))
+                Dim newSeasonData As ConcertInformations = ser.Deserialize(fs)
+
+                For Each concert In newSeasonData
+                    For Each composition In concert.Compositions
+                        Dim foundItem = Library.FindRecommendation(composition)
+                        If foundItem IsNot Nothing Then
+                            composition.SetRecommendation(foundItem, False)
+                        End If
+                    Next
+                Next
+
+                Dim newSeasonInfo = New LocalSeasonInformation() With {.WorkingSeasonIndex = publishedSeasonIndex}
+                newSeasonInfo.WorkingSeasonInformation = New SeasonInformation() With {.ConcertInformations = newSeasonData}
+                Me.WorkingSeasonInformation = newSeasonInfo
+
+                Return True
+            End Using
+
+        Catch ex As Exception
+            Return False
+        End Try
     End Function
 
-    Friend Function SaveSeason(publishedSeasonIndex As PublishedSeasonIndex, infos As ConcertInformations) As Boolean
+    Friend Function SaveSeason(publishedSeasonIndex As PublishedSeasonIndex) As Boolean
+        Return SaveSeason(publishedSeasonIndex, Me.WorkingSeasonInformation.WorkingSeasonInformation)
+    End Function
+
+    Friend Function SaveSeason(publishedSeasonIndex As PublishedSeasonIndex, infos As SeasonInformation) As Boolean
         Dim shouldStartTimer As Boolean = _timerSeasonPlannerIndexes.Enabled
         _timerSeasonPlannerIndexes.Stop()
 
@@ -629,7 +611,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
             Dim fileName = IO.Path.GetFileName(publishedSeasonIndex.ftpPath)
             Using fs As New IO.FileStream(fileName, IO.FileMode.Create)
-                Dim ser As New Xml.Serialization.XmlSerializer(GetType(ConcertInformations))
+                Dim ser As New Xml.Serialization.XmlSerializer(GetType(SeasonInformation))
                 ser.Serialize(fs, infos)
             End Using
 
@@ -703,6 +685,9 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
 
     Friend Async Function LoadSeasonPlannerItems() As Task(Of Boolean)
+        If Not (WorkingSeasonInformation.WorkingSeasonInformation.GetTotalSeasonPlannerItemCount = 0 AndAlso IO.File.Exists(LocalPath_SeasonPlanningItems)) Then
+            Return True
+        End If
         Try
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Loading Season Planner...", .IsMarquee = True})
 
@@ -744,14 +729,12 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                     Return seasonPlannerItemsInternal
                 End Function)
 
-            Me.HiddenSeasonPlannerItems = New SeasonPlanningList
-            Me.SeasonPlannerItems = New SeasonPlanningList
             For Each seasonItem In seasonPlannerItemsTemp
                 Dim rec = Library.FindRecommendation(seasonItem)
                 If rec IsNot Nothing Then
-                    Me.SeasonPlannerItems.Add(New SeasonItem(rec))
+                    Me.WorkingSeasonInformation.WorkingSeasonInformation.AddSeasonPlannerItem(New SeasonItem(rec))
                 Else
-                    Me.SeasonPlannerItems.Add(seasonItem)
+                    Me.WorkingSeasonInformation.WorkingSeasonInformation.AddSeasonPlannerItem(seasonItem)
                 End If
             Next
 
@@ -766,50 +749,74 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         End Try
     End Function
 
-    Friend Function SaveSeasonPlannerItems() As Boolean
+    Friend Async Function LoadWorkingSeasonInformation() As Task(Of Boolean)
         Try
-            RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Saving Season Planner...", .IsMarquee = True})
+            Dim exInternal As Exception = Nothing
+            Try
+                RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Loading Local Season Data...", .IsMarquee = True})
 
-            Using fs As New IO.FileStream(LocalPath_SeasonPlanningItems, IO.FileMode.Create)
-                Dim ser As New Xml.Serialization.XmlSerializer(GetType(SeasonPlanningList))
+                Dim localInfos As LocalSeasonInformation = Await Task.Run(
+                    Function()
+                        Dim localInfosInternal As LocalSeasonInformation
 
-                Dim combinedSpl As New List(Of SeasonItem)
-                For Each item In SeasonPlannerItems
-                    combinedSpl.Add(item)
-                Next
-                For Each item In _HiddenSeasonPlannerItems
-                    combinedSpl.Add(item)
-                Next
-                combinedSpl.Sort(Function(x, y)
-                                     Dim compScore = x.Composer.CompareTo(y.Composer)
-                                     If compScore <> 0 Then Return compScore
-                                     Return x.Title.CompareTo(y.Title)
-                                 End Function)
+                        If IO.File.Exists(LocalPath_WorkingSeasonInfo) Then
+                            Using fs As New IO.FileStream(LocalPath_WorkingSeasonInfo, IO.FileMode.Open)
+                                Dim ser As New Xml.Serialization.XmlSerializer(GetType(LocalSeasonInformation))
+                                localInfosInternal = ser.Deserialize(fs)
+                            End Using
 
-                Dim splToSave As New SeasonPlanningList
-                For Each item In combinedSpl
-                    If splToSave.FindSeasonItem(item) Is Nothing Then
-                        splToSave.Add(item)
-                    End If
-                Next
+                            For Each concertInfo In localInfosInternal.WorkingSeasonInformation.ConcertInformations
+                                For Each composition In concertInfo.Compositions
+                                    Dim foundRec = Me.Library.FindRecommendation(composition)
+                                    If foundRec IsNot Nothing Then
+                                        composition.SetRecommendation(foundRec, False)
+                                    End If
+                                Next
+                            Next
 
-                ser.Serialize(fs, splToSave)
-            End Using
+                            For Each itemList In {localInfosInternal.WorkingSeasonInformation.SeasonPlannerItems, localInfosInternal.WorkingSeasonInformation.HiddenSeasonPlannerItems}
+                                For Each item In itemList
+                                    Dim foundRec = Me.Library.FindRecommendation(item)
+                                    If foundRec IsNot Nothing Then
+                                        item.SetRecommendation(foundRec, False)
+                                    End If
+                                Next
+                            Next
+                        Else
+                            localInfosInternal = New LocalSeasonInformation With {.WorkingSeasonInformation = New SeasonInformation() With {.ConcertInformations = New ConcertInformations}}
+                        End If
+
+                        Return localInfosInternal
+                    End Function)
+
+                Me.WorkingSeasonInformation = localInfos
+
+                Return True
+            Catch ex As Exception
+                exInternal = ex
+            End Try
+
+            If exInternal IsNot Nothing Then
+                If Await LoadWorkingSeasonInformation_Legacy() Then
+                    Return True
+                Else
+                    Throw exInternal
+                End If
+            End If
 
             Return True
         Catch ex As Exception
             RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
-                                     .ErrorCode = ErrorCodeEventArgs.ErrorCodes.CouldNotSaveUserSeasonPlanningList})
+                                         .ErrorCode = ErrorCodeEventArgs.ErrorCodes.CouldNotLoadUserWorkingSeasonData})
             Return False
         Finally
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Visible = False})
         End Try
+
     End Function
 
-    Friend Async Function LoadWorkingSeasonInformation() As Task(Of Boolean)
+    Friend Async Function LoadWorkingSeasonInformation_Legacy() As Task(Of Boolean)
         Try
-            RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Loading Local Season Data...", .IsMarquee = True})
-
             Dim localInfos As LocalConcertInformations = Await Task.Run(
                 Function()
                     Dim localInfosInternal As LocalConcertInformations
@@ -835,27 +842,27 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                     Return localInfosInternal
                 End Function)
 
-            Me.WorkingSeasonInformation = localInfos
+            Dim newInfo As New LocalSeasonInformation()
+            newInfo.WorkingSeasonIndex = localInfos.WorkingSeasonIndex
+            newInfo.WorkingSeasonInformation = New SeasonInformation
+            newInfo.WorkingSeasonInformation.ConcertInformations = localInfos.WorkingConcertInformations
+
+            Me.WorkingSeasonInformation = newInfo
 
             Return True
         Catch ex As Exception
-            RaiseEvent ErrorOccurred(Me, New ErrorCodeEventArgs() With {
-                                     .ErrorCode = ErrorCodeEventArgs.ErrorCodes.CouldNotLoadUserWorkingSeasonData})
             Return False
-        Finally
-            RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Visible = False})
         End Try
     End Function
 
-    Friend Function SaveWorkingSeasonInformation(publishedSeasonIndex As PublishedSeasonIndex, infos As ConcertInformations) As Boolean
+    Friend Function SaveWorkingSeasonInformation(publishedSeasonIndex As PublishedSeasonIndex, seasonInfo As SeasonInformation) As Boolean
         Try
             RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs() With {.Caption = "Saving Season Data...", .IsMarquee = True})
 
-
-            Dim localInfos As New LocalConcertInformations With {.WorkingConcertInformations = infos, .WorkingSeasonIndex = publishedSeasonIndex}
+            Dim localInfos As New LocalSeasonInformation With {.WorkingSeasonInformation = seasonInfo, .WorkingSeasonIndex = publishedSeasonIndex}
 
             Using fs As New IO.FileStream(LocalPath_WorkingSeasonInfo, IO.FileMode.Create)
-                Dim ser As New Xml.Serialization.XmlSerializer(GetType(LocalConcertInformations))
+                Dim ser As New Xml.Serialization.XmlSerializer(localInfos.GetType)
                 ser.Serialize(fs, localInfos)
             End Using
 
@@ -871,7 +878,8 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
     Friend Function NewWorkingSeasonInformation() As Boolean
         Try
-            Dim localInfos As New LocalConcertInformations() With {.WorkingConcertInformations = New ConcertInformations}
+            Dim localInfos As New LocalSeasonInformation() With {.WorkingSeasonInformation = New SeasonInformation}
+            localInfos.WorkingSeasonInformation.ConcertInformations = New ConcertInformations
             Me.WorkingSeasonInformation = localInfos
 
             Return True
@@ -908,85 +916,6 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         End Try
 
     End Function
-
-    Friend Sub CopyCurrentSeasonItemsToPlanningList()
-        For Each concertInfo In WorkingSeasonInformation.WorkingConcertInformations
-            For Each compositionInfo In concertInfo.Compositions
-                If Me.SeasonPlannerItems.FindSeasonItem(compositionInfo) Is Nothing AndAlso
-                    Me.HiddenSeasonPlannerItems.FindSeasonItem(compositionInfo) Is Nothing Then
-
-                    Me.HiddenSeasonPlannerItems.Add(compositionInfo)
-                End If
-            Next
-        Next
-    End Sub
-
-    Friend Sub ClearSeasonPlanningList()
-        Me.HiddenSeasonPlannerItems.Clear()
-        Me.SeasonPlannerItems.Clear()
-    End Sub
-
-    Private Sub EnsureNoSeasonPlanningDuplicates()
-
-        ' First, move all hidden items to the season list (except dupes).
-        If SeasonPlannerItems IsNot Nothing Then
-            While _HiddenSeasonPlannerItems.Count > 0
-                Dim hiddenItem = _HiddenSeasonPlannerItems.First
-                _HiddenSeasonPlannerItems.RemoveAt(0)
-                If SeasonPlannerItems.FindSeasonItem(hiddenItem) Is Nothing Then
-                    SeasonPlannerItems.Add(hiddenItem)
-                End If
-            End While
-
-            Dim usedItems As New SeasonPlanningList
-            Dim splToDelete As New List(Of SeasonItem)
-            For Each item In SeasonPlannerItems
-                If usedItems.FindSeasonItem(item) IsNot Nothing Then
-                    splToDelete.Add(item)
-                Else
-                    usedItems.Add(item)
-                End If
-            Next
-            For Each item In splToDelete
-                SeasonPlannerItems.Remove(item)
-            Next
-        End If
-
-        ' Next, make sure that the concerts don't have dupes.
-        Dim usedCompositions As New SeasonPlanningList
-        If WorkingSeasonInformation IsNot Nothing AndAlso WorkingSeasonInformation.WorkingConcertInformations IsNot Nothing Then
-            ' Make sure no duplicates on concerts
-            For Each concertInfo In WorkingSeasonInformation.WorkingConcertInformations
-
-                Dim compositionsToDelete As New List(Of SeasonItem)
-
-                For Each composition In concertInfo.Compositions
-                    If usedCompositions.FindSeasonItem(composition) IsNot Nothing Then
-                        compositionsToDelete.Add(composition)
-                    Else
-                        usedCompositions.Add(composition)
-                    End If
-                Next
-
-                For Each compositionToDelete In compositionsToDelete
-                    concertInfo.Compositions.Remove(compositionToDelete)
-                Next
-            Next
-        End If
-
-        ' Finally, move any items from season toolbox that are in concerts to hidden list.
-        If SeasonPlannerItems IsNot Nothing Then
-            ' Make sure that season toolbox doesn't contain anything from a concert.
-            For Each usedComposition In usedCompositions
-                Dim foundSeasonItem = SeasonPlannerItems.FindSeasonItem(usedComposition)
-                If foundSeasonItem IsNot Nothing Then
-                    SeasonPlannerItems.Remove(foundSeasonItem)
-                    _HiddenSeasonPlannerItems.Add(foundSeasonItem)
-                End If
-            Next
-        End If
-
-    End Sub
 
 #End Region
 

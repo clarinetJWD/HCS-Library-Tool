@@ -67,7 +67,10 @@ Public Class ConcertGrid
 
                 For i As Integer = rowsToMove.Count - 1 To 0 Step -1
                     Dim row = rowsToMove(i)
-                    sourceView.DataSource.Remove(row)
+
+                    If sourceView.DataSource IsNot _Presenter.SeasonPlannerItems Then
+                        sourceView.DataSource.Remove(row)
+                    End If
 
                     If insertLocation >= 0 AndAlso insertLocation < targetView.DataRowCount Then
                         targetView.DataSource.Insert(insertLocation, row)
@@ -79,6 +82,7 @@ Public Class ConcertGrid
 
                 e.Handled = True
         End Select
+        _Presenter.EnsureNoSeasonPlanningDuplicates()
     End Sub
 
     Friend Sub InitializeInfo(concertInformation As ConcertInformation, eras As Eras, tags As Tags)

@@ -11,6 +11,7 @@ Imports DevExpress.XtraBars.Navigation
 Imports DevExpress.XtraGrid
 Imports DevExpress.XtraGrid.Views.Grid
 Imports FluentFTP
+Imports Npgsql
 
 Public Class Form1 : Implements INotifyPropertyChanged
 
@@ -61,20 +62,18 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
 #If DEBUG Then
         If Not Debugger.IsAttached Then MsgBox("Attach Debugger")
-#End If
 
+#End If
         If Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
             Try
                 Me.Text &= $" v{Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion:4}"
             Catch ex As Exception
             End Try
         End If
-
         InitializeTabs()
         InitializeConcertGrids()
         InitializeData()
     End Sub
-
     Private Sub InitializeTabs()
         Me.TabNavigationPageLibrary.PageVisible = LibraryTabIsVisible
         Me.TabNavigationPageMetadata.PageVisible = MetadataTabIsVisible
@@ -163,10 +162,6 @@ Public Class Form1 : Implements INotifyPropertyChanged
         If ofd.ShowDialog = DialogResult.OK Then
             LoadCsv(ofd.FileName)
         End If
-    End Sub
-
-    Private Sub BarButtonItemCopySeasonToPlanningList_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemCopySeasonToPlanningList.ItemClick
-        _Presenter.CopyCurrentSeasonItemsToPlanningList()
     End Sub
 
     Private Sub BarButtonItemClearSeasonPlanner_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemClearSeasonPlanner.ItemClick
@@ -317,6 +312,7 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
                 e.Handled = True
         End Select
+        _Presenter.EnsureNoSeasonPlanningDuplicates()
     End Sub
 
     Private Function GetConcertGrids() As List(Of ConcertGrid)
@@ -396,7 +392,9 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
     Private Sub OnSaveAsNewSeason(sender As Object, e As ItemClickEventArgs)
         Dim fName = DevExpress.XtraEditors.XtraInputBox.Show("File Name", "Publish New Season", "Untitled")
-        If fName = Nothing OrElse fName.Trim = Nothing Then fName = "Untitled"
+        If fName = Nothing OrElse fName.Trim = Nothing Then
+            Exit Sub
+        End If
         Dim fNameActual = GetUniqueSeasonName(fName)
 
         Dim publishedSeasonIndex As PublishedSeasonIndex = Nothing
@@ -585,11 +583,11 @@ Public Class Form1 : Implements INotifyPropertyChanged
                           Dim concertGrids As New List(Of ConcertGrid) From {ConcertGrid1, ConcertGrid2, ConcertGrid3, ConcertGrid4, ConcertGrid5, ConcertGrid6}
 
                           For i As Integer = 0 To concertGrids.Count - 1
-                              If _Presenter.WorkingSeasonInformation.WorkingConcertInformations.Count <= i Then
-                                  _Presenter.WorkingSeasonInformation.WorkingConcertInformations.Add(New ConcertInformation)
+                              If _Presenter.WorkingSeasonInformation.WorkingSeasonInformation.ConcertInformations.Count <= i Then
+                                  _Presenter.WorkingSeasonInformation.WorkingSeasonInformation.ConcertInformations.Add(New ConcertInformation)
                               End If
 
-                              Dim concertInfo = _Presenter.WorkingSeasonInformation.WorkingConcertInformations(i)
+                              Dim concertInfo = _Presenter.WorkingSeasonInformation.WorkingSeasonInformation.ConcertInformations(i)
                               concertGrids(i).InitializeInfo(concertInfo, _Presenter.Eras, _Presenter.Tags)
                           Next
 
@@ -1110,14 +1108,13 @@ Public Class Form1 : Implements INotifyPropertyChanged
             Using fs As New IO.FileStream(LocalPath_SeasonPlanningGridSettings, IO.FileMode.Create)
                 GridViewSeasonPlanner.SaveLayoutToStream(fs)
             End Using
-            _Presenter.SaveSeasonPlannerItems()
         End If
 
         If _Presenter.WorkingSeasonIsLoaded Then
             For Each concertControl In GetConcertGrids()
                 concertControl.SaveLayout()
             Next
-            _Presenter.SaveWorkingSeasonInformation(_CurrentlyAppliedSeason, _Presenter.WorkingSeasonInformation.WorkingConcertInformations)
+            _Presenter.SaveWorkingSeasonInformation(_CurrentlyAppliedSeason, _Presenter.WorkingSeasonInformation.WorkingSeasonInformation)
         End If
 
     End Sub

@@ -43,7 +43,6 @@ Partial Class Form1
         Me.BarButtonItemRefreshMetadataSelected = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemEditMetadata = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemEditSeason = New DevExpress.XtraBars.BarSubItem()
-        Me.BarButtonItemCopySeasonToPlanningList = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemLayoutMenu = New DevExpress.XtraBars.BarSubItem()
         Me.BarStatus = New DevExpress.XtraBars.Bar()
         Me.BarEditItemProgressBar = New DevExpress.XtraBars.BarEditItem()
@@ -185,7 +184,7 @@ Partial Class Form1
         Me.BarManager1.DockControls.Add(Me.barDockControlLeft)
         Me.BarManager1.DockControls.Add(Me.barDockControlRight)
         Me.BarManager1.Form = Me
-        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibrary, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarButtonItemCopySeasonToPlanningList, Me.BarSubItemDeleteSeason, Me.BarButtonItemRefreshMetadataAll, Me.BarSubItemFileMetadata, Me.BarSubItemEditMetadata, Me.BarButtonItemRefreshMetadataSelected, Me.BarButtonItemNewSeason, Me.BarButtonItemClearSeasonPlanner})
+        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibrary, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarSubItemDeleteSeason, Me.BarButtonItemRefreshMetadataAll, Me.BarSubItemFileMetadata, Me.BarSubItemEditMetadata, Me.BarButtonItemRefreshMetadataSelected, Me.BarButtonItemNewSeason, Me.BarButtonItemClearSeasonPlanner})
         Me.BarManager1.MainMenu = Me.BarMainMenu
         Me.BarManager1.MaxItemId = 26
         Me.BarManager1.RepositoryItems.AddRange(New DevExpress.XtraEditors.Repository.RepositoryItem() {Me.RepositoryItemProgressBar1, Me.RepositoryItemMarqueeProgressBar1})
@@ -303,15 +302,8 @@ Partial Class Form1
         '
         Me.BarSubItemEditSeason.Caption = "Edit"
         Me.BarSubItemEditSeason.Id = 16
-        Me.BarSubItemEditSeason.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemCopySeasonToPlanningList), New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemClearSeasonPlanner)})
+        Me.BarSubItemEditSeason.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemClearSeasonPlanner)})
         Me.BarSubItemEditSeason.Name = "BarSubItemEditSeason"
-        '
-        'BarButtonItemCopySeasonToPlanningList
-        '
-        Me.BarButtonItemCopySeasonToPlanningList.Caption = "Add all Propsed Season items to Planner List"
-        Me.BarButtonItemCopySeasonToPlanningList.Id = 17
-        Me.BarButtonItemCopySeasonToPlanningList.ItemShortcut = New DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.Left))
-        Me.BarButtonItemCopySeasonToPlanningList.Name = "BarButtonItemCopySeasonToPlanningList"
         '
         'BarSubItemLayoutMenu
         '
@@ -1045,7 +1037,6 @@ Partial Class Form1
     Friend WithEvents LayoutControlGroupSeasonConcert5 As DevExpress.XtraLayout.LayoutControlGroup
     Friend WithEvents LayoutControlGroupSeasonConcert6 As DevExpress.XtraLayout.LayoutControlGroup
     Friend WithEvents BarSubItemEditSeason As DevExpress.XtraBars.BarSubItem
-    Friend WithEvents BarButtonItemCopySeasonToPlanningList As DevExpress.XtraBars.BarButtonItem
     Friend WithEvents LayoutControlMetadata As DevExpress.XtraLayout.LayoutControl
     Friend WithEvents GridControlEras As DevExpress.XtraGrid.GridControl
     Friend WithEvents GridViewEras As DevExpress.XtraGrid.Views.Grid.GridView

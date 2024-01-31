@@ -87,7 +87,7 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
         End Get
     End Property
 
-    Friend ReadOnly Property WorkingSeasonInformation As LocalConcertInformations
+    Friend ReadOnly Property WorkingSeasonInformation As LocalSeasonInformation
         Get
             Return _Model.WorkingSeasonInformation
         End Get
@@ -95,13 +95,13 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
 
     Friend ReadOnly Property SeasonPlannerItems As SeasonPlanningList
         Get
-            Return _Model.SeasonPlannerItems
+            Return _Model.WorkingSeasonInformation?.WorkingSeasonInformation?.SeasonPlannerItems
         End Get
     End Property
 
     Friend ReadOnly Property HiddenSeasonPlannerItems As SeasonPlanningList
         Get
-            Return _Model.HiddenSeasonPlannerItems
+            Return _Model.WorkingSeasonInformation?.WorkingSeasonInformation?.HiddenSeasonPlannerItems
         End Get
     End Property
 
@@ -288,18 +288,18 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
             TagsLoadError = False
         End If
 
-        If Not Await _Model.LoadSeasonPlannerItems() Then
-            SeasonPlannerListLoadError = True
-        Else
-            SeasonPlannerListIsLoaded = True
-            SeasonPlannerListLoadError = False
-        End If
-
         If Not Await _Model.LoadWorkingSeasonInformation() Then
             WorkingSeasonLoadError = True
         Else
             WorkingSeasonIsLoaded = True
             WorkingSeasonLoadError = False
+        End If
+
+        If Not Await _Model.LoadSeasonPlannerItems() Then
+            SeasonPlannerListLoadError = True
+        Else
+            SeasonPlannerListIsLoaded = True
+            SeasonPlannerListLoadError = False
         End If
 
         If Not Await Task.Run(Function() _Model.InitializeSeasonPlanningIndexes()) Then
@@ -333,13 +333,12 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
                 RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Tags)))
             Case NameOf(LibraryToolModel.PublishedSeasonIndexes)
                 RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(PublishedSeasonIndexes)))
-            Case NameOf(LibraryToolModel.WorkingSeasonInformation)
-                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(WorkingSeasonInformation)))
-            Case NameOf(LibraryToolModel.SeasonPlannerItems)
+            Case NameOf(LibraryToolModel.WorkingSeasonInformation), NameOf(LibraryToolModel.SeasonPlannerItems), NameOf(LibraryToolModel.HiddenSeasonPlannerItems)
                 _SeasonPlannerItemsForEvents = _Model.SeasonPlannerItems
-                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(SeasonPlannerItems)))
-            Case NameOf(LibraryToolModel.HiddenSeasonPlannerItems)
                 _HiddenSeasonPlannerItemsForEvents = _Model.HiddenSeasonPlannerItems
+
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(WorkingSeasonInformation)))
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(SeasonPlannerItems)))
                 RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(HiddenSeasonPlannerItems)))
         End Select
     End Sub
@@ -435,16 +434,7 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
         End Try
     End Function
 
-    Friend Function SaveSeasonPlannerItems() As Boolean
-        Try
-            IsAllowedClose = False
-            Return _Model.SaveSeasonPlannerItems()
-        Finally
-            IsAllowedClose = True
-        End Try
-    End Function
-
-    Friend Function SaveWorkingSeasonInformation(publishedSeasonIndex As PublishedSeasonIndex, infos As ConcertInformations) As Boolean
+    Friend Function SaveWorkingSeasonInformation(publishedSeasonIndex As PublishedSeasonIndex, infos As SeasonInformation) As Boolean
         Try
             IsAllowedClose = False
             Return _Model.SaveWorkingSeasonInformation(publishedSeasonIndex, infos)
@@ -498,34 +488,34 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
         End Try
     End Function
 
-    Friend Sub CopyCurrentSeasonItemsToPlanningList()
+    Friend Sub ClearSeasonPlanningList()
         Try
             IsAllowedClose = False
-            _Model.CopyCurrentSeasonItemsToPlanningList()
+            _Model.WorkingSeasonInformation.WorkingSeasonInformation.ClearSeasonPlanningList()
         Finally
             IsAllowedClose = True
         End Try
     End Sub
 
-    Friend Sub ClearSeasonPlanningList()
+    Friend Sub EnsureNoSeasonPlanningDuplicates()
         Try
             IsAllowedClose = False
-            _Model.ClearSeasonPlanningList()
+            _Model.WorkingSeasonInformation.WorkingSeasonInformation.EnsureNoSeasonPlanningDuplicates()
         Finally
             IsAllowedClose = True
         End Try
     End Sub
 
     Friend Function GetTotalSeasonPlannerItemCount() As Integer
-        Return If(SeasonPlannerItems?.Count, 0) + If(HiddenSeasonPlannerItems?.Count, 0)
+        Return If(_Model.WorkingSeasonInformation?.WorkingSeasonInformation.GetTotalSeasonPlannerItemCount, 0)
     End Function
 
     Friend Function GetHiddenSeasonPlannerItemCount() As Integer
-        Return If(HiddenSeasonPlannerItems?.Count, 0)
+        Return If(_Model.WorkingSeasonInformation?.WorkingSeasonInformation.GetHiddenSeasonPlannerItemCount, 0)
     End Function
 
     Friend Function GetVisibleSeasonPlannerItemCount() As Integer
-        Return If(SeasonPlannerItems?.Count, 0)
+        Return If(_Model.WorkingSeasonInformation?.WorkingSeasonInformation.GetVisibleSeasonPlannerItemCount, 0)
     End Function
 
 #End Region
