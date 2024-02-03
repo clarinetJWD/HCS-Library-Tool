@@ -31,21 +31,51 @@ Public Module Constants
 
 #Region "Files and Paths"
 
+#Region "Files and Paths - AppData"
+
+    ReadOnly Property LocalDirectory_AppData As String
+        Get
+            If Not IO.Directory.Exists(IO.Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "HcsLibraryTool")) Then
+                IO.Directory.CreateDirectory(IO.Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "HcsLibraryTool"))
+            End If
+            Return IO.Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "HcsLibraryTool")
+        End Get
+    End Property
+
+    ReadOnly Property LocalDirectory_AppData_Library As String
+        Get
+            If Not IO.Directory.Exists(IO.Path.Combine(LocalDirectory_AppData, "Library")) Then
+                IO.Directory.CreateDirectory(IO.Path.Combine(LocalDirectory_AppData, "Library"))
+            End If
+            Return IO.Path.Combine(LocalDirectory_AppData, "Library")
+        End Get
+    End Property
+
+#End Region
+
+#Region "Files and Paths - Library"
+
+    ReadOnly Property HttpPath_Library As String
+        Get
+            Return "https://jwd.gay/apps/hcs-library-tool/library.dat"
+        End Get
+    End Property
+
     ReadOnly Property FtpPath_Library As String
         Get
             Return "library.dat"
         End Get
     End Property
 
-    ReadOnly Property FtpPath_Library_Temp(uniqueString As String) As String
+    ReadOnly Property HttpPath_Library_Temp(uniqueString As String) As String
         Get
-            Return $"library_{uniqueString}.dat"
+            Return $"https://jwd.gay/apps/hcs-library-tool/bak/library_{uniqueString}.dat"
         End Get
     End Property
 
-    ReadOnly Property FtpPath_PublishedSeasons As String
+    ReadOnly Property FtpPath_Library_Temp(uniqueString As String) As String
         Get
-            Return "published_seasons.dat"
+            Return $"bak\library_{uniqueString}.dat"
         End Get
     End Property
 
@@ -58,6 +88,22 @@ Public Module Constants
     ReadOnly Property LocalPath_Library_Temp(uniqueString As String) As String
         Get
             Return IO.Path.Combine(LocalDirectory_AppData_Library, $"library_{uniqueString}.dat")
+        End Get
+    End Property
+
+#End Region
+
+#Region "Files and Paths - Published Seasons"
+
+    ReadOnly Property HttpPath_PublishedSeasons As String
+        Get
+            Return "https://jwd.gay/apps/hcs-library-tool/published_seasons.dat"
+        End Get
+    End Property
+
+    ReadOnly Property FtpPath_PublishedSeasons As String
+        Get
+            Return "published_seasons.dat"
         End Get
     End Property
 
@@ -90,6 +136,10 @@ Public Module Constants
             Return IO.Path.Combine(LocalDirectory_AppData_Library, $"working_season_info_{uniqueString}.dat")
         End Get
     End Property
+
+#End Region
+
+#Region "Files and Paths - Grid Settings"
 
     ReadOnly Property LocalPath_RecommendationGridSettings As String
         Get
@@ -127,24 +177,49 @@ Public Module Constants
         End Get
     End Property
 
+#End Region
 
-    ReadOnly Property LocalDirectory_AppData As String
+#Region "Files and Paths - Credentials"
+
+    ReadOnly Property FtpPath_FtpCredentials As String
         Get
-            If Not IO.Directory.Exists(IO.Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "HcsLibraryTool")) Then
-                IO.Directory.CreateDirectory(IO.Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "HcsLibraryTool"))
-            End If
-            Return IO.Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "HcsLibraryTool")
+            Return "credentials.enc"
         End Get
     End Property
 
-    ReadOnly Property LocalDirectory_AppData_Library As String
+    ReadOnly Property HttpPath_FtpCredentials As String
         Get
-            If Not IO.Directory.Exists(IO.Path.Combine(LocalDirectory_AppData, "Library")) Then
-                IO.Directory.CreateDirectory(IO.Path.Combine(LocalDirectory_AppData, "Library"))
-            End If
-            Return IO.Path.Combine(LocalDirectory_AppData, "Library")
+            Return "https://jwd.gay/apps/hcs-library-tool/credentials.enc"
         End Get
     End Property
+
+    ReadOnly Property HttpPath_DatabaseCredentials(useDebugDatabase As Boolean)
+        Get
+            If useDebugDatabase Then
+                Return "https://jwd.gay/apps/hcs-library-tool/db_cred_local.enc"
+            Else
+                Return "https://jwd.gay/apps/hcs-library-tool/db_cred.enc"
+            End If
+        End Get
+    End Property
+
+    ReadOnly Property FtpPath_UserCredentials(username As String) As String
+        Get
+            Dim encUser = EncryptionHelper.EncryptString(username.ToLower, "user-cred-file")
+            Dim fileName = MakeAlphaNumeric(encUser) & ".enc"
+            Return "users\" & fileName
+        End Get
+    End Property
+
+    ReadOnly Property HttpPath_UserCredentials(username As String) As String
+        Get
+            Dim encUser = EncryptionHelper.EncryptString(username.ToLower, "user-cred-file")
+            Dim fileName = MakeAlphaNumeric(encUser) & ".enc"
+            Return "https://jwd.gay/apps/hcs-library-tool/users/" & fileName
+        End Get
+    End Property
+
+#End Region
 
     Private Sub CleanUpDataFiles()
         If IO.File.Exists("library.dat") Then
@@ -203,7 +278,5 @@ Public Module Constants
     End Sub
 
 #End Region
-
-
 
 End Module

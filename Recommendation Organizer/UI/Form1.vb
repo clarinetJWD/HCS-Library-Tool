@@ -58,6 +58,17 @@ Public Class Form1 : Implements INotifyPropertyChanged
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
+
+        'DatabaseConnection.DB = New DatabaseConnection(True)
+
+        'If Not CredentialsHelper.TestSavedCredentials() Then
+        '    Dim uaw As New UserAccountWizard
+        '    uaw.ShowDialog()
+        'End If
+
+        'Dim dbCon = DatabaseConnection.DB.GetDatabaseConnection()
+        'dbCon.Close()
+
         _Context = Threading.SynchronizationContext.Current
 
 #If DEBUG Then
@@ -795,7 +806,7 @@ Public Class Form1 : Implements INotifyPropertyChanged
 #Region "Security"
 
     Private Function LoadOrPromptPassword() As Boolean
-        If Not FtpAndSecurity.TestPasscode(My.Settings.Passcode) Then
+        If Not Ftp.ValidatePasscode(My.Settings.Passcode) Then
             Dim fPass As New PasscodeForm()
             If Not fPass.ShowDialog Then
                 DevExpress.XtraEditors.XtraMessageBox.Show("Passcode could not be validated. Application will exit...")

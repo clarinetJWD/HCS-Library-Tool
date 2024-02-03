@@ -18,7 +18,7 @@ Public Class PasscodeForm
         My.Settings.Passcode = passcode
         My.Settings.Save()
 
-        If FtpAndSecurity.TestPasscode(passcode) Then
+        If Ftp.ValidatePasscode(passcode) Then
             _IsValidated = True
             Me.Close()
         Else
@@ -37,7 +37,7 @@ Public Class PasscodeForm
     Shadows Function ShowDialog() As Boolean
         MyBase.ShowDialog()
         If _IsValidated Is Nothing Then
-            Return FtpAndSecurity.TestPasscode(My.Settings.Passcode)
+            Return Ftp.ValidatePasscode(My.Settings.Passcode)
         End If
         Return _IsValidated.Value
     End Function

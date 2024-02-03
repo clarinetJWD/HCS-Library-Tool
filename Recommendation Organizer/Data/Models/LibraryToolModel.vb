@@ -1,4 +1,6 @@
 ﻿Imports System.ComponentModel
+Imports System.Net
+Imports DevExpress.Drawing.Internal.Images
 Imports FluentFTP
 
 Public Class LibraryToolModel : Implements INotifyPropertyChanged
@@ -51,10 +53,10 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             Dim success As Boolean = True
             Dim needsSave As Boolean = False
 
+            success = Await HttpDownloadFileAsync(LocalPath_Library, HttpPath_Library, True, "Loading Library...")
+
             Dim newLibraryData As LibraryData = Await Task.Run(
                 Function()
-                    success = FtpDownloadFile(LocalPath_Library, FtpPath_Library, True, "Loading Library...", 5)
-
                     Dim newLibraryDataInternal As LibraryData = Nothing
 
                     If success Then
@@ -161,7 +163,8 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                     End Using
 
                     ' Check if server file is newer than your file.
-                    Dim success = FtpDownloadFile(LocalPath_Library_Temp("temp"), FtpPath_Library, True, "Saving Library...", 5)
+                    Dim successTask = HttpDownloadFileAsync(LocalPath_Library_Temp("temp"), HttpPath_Library, True, "Saving Library...")
+                    Dim success As Boolean = successTask.Result
 
                     If success Then
                         Using fs As New IO.FileStream(LocalPath_Library_Temp("temp"), IO.FileMode.Open)
@@ -169,8 +172,8 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                             If tmpLib.LastChanged <= prevLibDate Then
 
                                 Dim libBackupSuccess = True
-                                If FtpFileExists(FtpPath_Library) Then
-                                    libBackupSuccess = FtpMoveFile(FtpPath_Library, FtpPath_Library_Temp(Now.ToString("yyyyMMddHHmmssfff")))
+                                If Ftp.FileExists(FtpPath_Library) Then
+                                    libBackupSuccess = Ftp.MoveFile(FtpPath_Library, FtpPath_Library_Temp(Now.ToString("yyyyMMddHHmmssfff")))
                                 End If
 
                                 If Not libBackupSuccess Then
@@ -432,14 +435,13 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         Try
             Try
                 If CheckNeedsPublishedSeasonsUpdate() Then
-                    If FtpFileExists(FtpPath_PublishedSeasons) Then
-                        success = FtpDownloadFile(LocalPath_PublishedSeasons, FtpPath_PublishedSeasons, True, "Updating Published Seasons...", 5)
+                    Dim successTask = HttpDownloadFileAsync(LocalPath_PublishedSeasons, HttpPath_PublishedSeasons, True, "Updating Published Seasons...")
+                    success = successTask.Result
 
-                        If success Then
-                            _PublishedSeasonsIndexUpdatedAt = FtpGetModifiedTime(FtpPath_PublishedSeasons)
-                        End If
-                        needsUpdate = True
+                    If success Then
+                        _PublishedSeasonsIndexUpdatedAt = Ftp.GetModifiedTime(FtpPath_PublishedSeasons)
                     End If
+                    needsUpdate = True
                 Else
                     If _PublishedSeasonIndexes Is Nothing Then
                         _PublishedSeasonIndexes = New PublishedSeasonIndexes
@@ -491,8 +493,8 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
     Private Function CheckNeedsPublishedSeasonsUpdate() As Boolean
         If _PublishedSeasonsIndexUpdatedAt = Date.MinValue Then Return True
 
-        If FtpFileExists(FtpPath_PublishedSeasons) Then
-            Return FtpGetModifiedTime(FtpPath_PublishedSeasons) > _PublishedSeasonsIndexUpdatedAt
+        If Ftp.FileExists(FtpPath_PublishedSeasons) Then
+            Return Ftp.GetModifiedTime(FtpPath_PublishedSeasons) > _PublishedSeasonsIndexUpdatedAt
         Else
             Return False
         End If
@@ -502,7 +504,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
         Try
             Dim fileName = IO.Path.GetFileName(publishedSeasonIndex.ftpPath)
 
-            If FtpFileExists(publishedSeasonIndex.ftpPath) Then
+            If Ftp.FileExists(publishedSeasonIndex.ftpPath) Then
                 Dim success = FtpDownloadFile(fileName, publishedSeasonIndex.ftpPath, True, "Loading Season Data...", 5)
 
                 If Not success Then
@@ -921,6 +923,59 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
 #Region "FTP"
 
+    Private Async Function HttpDownloadFileAsync(localPath As String, remotePath As String, useProgress As Boolean, progressCaption As String) As Task(Of Boolean)
+        Try
+            If useProgress Then
+                RaiseEvent ProgressChanged(
+                    Me,
+                    New ProgressBarEventArgs With {
+                        .IsMarquee = True,
+                        .Caption = progressCaption})
+            End If
+
+            Dim completeArgs As AsyncCompletedEventArgs = Nothing
+
+
+            Dim webClient As New WebClient()
+            AddHandler webClient.DownloadProgressChanged,
+                Sub(sender As Object, e As DownloadProgressChangedEventArgs)
+                    If useProgress Then
+                        RaiseEvent ProgressChanged(
+                                            Me,
+                                            New ProgressBarEventArgs With {
+                                                .Minimum = 0,
+                                                .Maximum = 100,
+                                                .Value = e.ProgressPercentage,
+                                                .Caption = progressCaption})
+                    End If
+                End Sub
+
+            AddHandler webClient.DownloadFileCompleted, Sub(sender As Object, e As AsyncCompletedEventArgs)
+                                                            completeArgs = e
+                                                        End Sub
+
+            webClient.DownloadFileAsync(New Uri(remotePath), localPath)
+
+            Await Task.Run(Sub()
+                               While completeArgs Is Nothing
+                                   Threading.Thread.Sleep(100)
+                               End While
+                           End Sub)
+
+
+            Return Not (completeArgs.Cancelled OrElse completeArgs.Error IsNot Nothing)
+
+        Finally
+            If useProgress Then
+                RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
+                                                       .Visible = False})
+            End If
+        End Try
+
+    End Function
+
+
+
     Private Function FtpDownloadFile(localPath As String, remotePath As String, useProgress As Boolean, progressCaption As String, numRetries As Integer) As Boolean
         Try
             If useProgress Then
@@ -931,32 +986,18 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                         .Caption = progressCaption})
             End If
 
-            Do
-                Try
-                    Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-                    If client.FileExists(remotePath) Then
-                        Dim dlStatus = client.DownloadFile(
-                        localPath, remotePath, FtpLocalExists.Overwrite, FtpVerify.Retry,
-                        Sub(prg As FtpProgress)
-                            If useProgress Then
-                                RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
+            Return Ftp.DownloadFile(localPath, remotePath, numRetries,
+                                        Sub(prg As FtpProgress)
+                                            If useProgress Then
+                                                RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
                                                        .Minimum = 0,
                                                        .Maximum = 100,
                                                        .Value = prg.Progress,
                                                        .Caption = progressCaption})
-                            End If
+                                            End If
 
-                        End Sub)
-                        Return (dlStatus = FtpStatus.Success)
-                    End If
-                Catch ex As Exception
-                    ' TODO Log
-                End Try
+                                        End Sub)
 
-                numRetries -= 1
-            Loop While numRetries > 0
-
-            Return False
         Finally
             If useProgress Then
                 RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
@@ -974,75 +1015,23 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                                                                    .Caption = progressCaption})
             End If
 
-            Do
-                Try
-                    Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-                    If IO.File.Exists(localPath) Then
-
-
-                        Dim upStatus = client.UploadFile(localPath, remotePath,, True, FtpVerify.Retry,
-                                                                   Sub(prg As FtpProgress)
-                                                                       If useProgress Then
-                                                                           RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
+            Return Ftp.UploadFile(localPath, remotePath, numRetries,
+                                             Sub(prg As FtpProgress)
+                                                 If useProgress Then
+                                                     RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
                                                                                .Minimum = 0,
                                                                                .Maximum = 100,
                                                                                .Value = prg.Progress,
                                                                                .Caption = progressCaption})
-                                                                       End If
-                                                                   End Sub)
+                                                 End If
+                                             End Sub)
 
-                        Return (upStatus = FtpStatus.Success)
-                    End If
-                Catch ex As Exception
-                    ' TODO Log
-                End Try
-
-                numRetries -= 1
-            Loop While numRetries > 0
-
-            Return False
         Finally
             If useProgress Then
                 RaiseEvent ProgressChanged(Me, New ProgressBarEventArgs With {
                                                        .Visible = False})
             End If
         End Try
-    End Function
-
-    Private Function FtpMoveFile(oldPath As String, newPath As String) As Boolean
-
-        Try
-            Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-            If client.FileExists(oldPath) Then
-                Return client.MoveFile(oldPath, newPath)
-            End If
-        Catch ex As Exception
-            ' TODO Log
-        End Try
-
-        Return False
-    End Function
-
-    Private Function FtpFileExists(path As String) As Boolean
-        Try
-            Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-            Return client.FileExists(path)
-        Catch ex As Exception
-            ' TODO Log
-        End Try
-
-        Return False
-    End Function
-
-    Private Function FtpGetModifiedTime(path As String) As Date
-        Try
-            Dim client As FtpClient = FtpAndSecurity.GetFtpConnection(My.Settings.Passcode)
-            Return client.GetModifiedTime(path)
-        Catch ex As Exception
-            ' TODO Log
-        End Try
-
-        Return Date.MinValue
     End Function
 
 #End Region
