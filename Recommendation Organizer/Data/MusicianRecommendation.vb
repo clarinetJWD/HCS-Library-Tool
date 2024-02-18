@@ -2,7 +2,7 @@
 Imports System.ComponentModel.DataAnnotations
 Imports Csv
 
-Public Class MusicianRecommendation : Implements INotifyPropertyChanged, IComposerTitle, ISupportHasChanges
+Public Class MusicianRecommendation : Implements INotifyPropertyChanged, IComposerTitleKey, ISupportHasChanges
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
@@ -40,7 +40,7 @@ Public Class MusicianRecommendation : Implements INotifyPropertyChanged, ICompos
 
 
     <Display(AutoGenerateField:=False)>
-    Property Key As String
+    Property Key As String Implements IKey.Key
         Get
             Return _Key
         End Get

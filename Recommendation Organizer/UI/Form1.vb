@@ -43,7 +43,6 @@ Public Class Form1 : Implements INotifyPropertyChanged
     ReadOnly Property SeasonPlanningTabIsVisible As Boolean
         Get
             Return _Presenter.SeasonPlannerListIsLoaded AndAlso Not _Presenter.SeasonPlannerListLoadError AndAlso
-                _Presenter.WorkingSeasonIsLoaded AndAlso Not _Presenter.WorkingSeasonLoadError AndAlso
                 _Presenter.SeasonIndexesAreLoaded AndAlso Not _Presenter.SeasonIndexesLoadError
         End Get
     End Property

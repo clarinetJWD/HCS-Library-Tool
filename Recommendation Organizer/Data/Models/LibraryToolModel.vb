@@ -853,6 +853,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
 
             Return True
         Catch ex As Exception
+            Me.WorkingSeasonInformation = New LocalSeasonInformation With {.WorkingSeasonInformation = New SeasonInformation() With {.ConcertInformations = New ConcertInformations}}
             Return False
         End Try
     End Function

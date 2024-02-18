@@ -289,6 +289,7 @@ Public Class LibraryToolPresenter : Implements INotifyPropertyChanged
         End If
 
         If Not Await _Model.LoadWorkingSeasonInformation() Then
+            WorkingSeasonIsLoaded = True
             WorkingSeasonLoadError = True
         Else
             WorkingSeasonIsLoaded = True

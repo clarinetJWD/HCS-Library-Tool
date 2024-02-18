@@ -45,12 +45,12 @@ Public Class Eras : Inherits BindingList(Of Era) : Implements ISupportHasChanges
         If item Is Nothing Then Return Nothing
 
         For Each listItem In Me
-            If listItem.Id = item.Id Then
+            If listItem IsNot Nothing AndAlso listItem.Id = item.Id Then
                 Return listItem
             End If
         Next
         For Each listItem In Me
-            If listItem.Name = item.Name Then
+            If listItem IsNot Nothing AndAlso listItem.Name = item.Name Then
                 Return listItem
             End If
         Next

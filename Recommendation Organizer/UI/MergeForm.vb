@@ -76,13 +76,17 @@ Public Class MergeForm
             eraList.Add(era)
         Next
         eraList = eraList.Distinct.ToList
-        eraList.Sort()
+        eraList.Sort(Function(x, y)
+                         Return If(x.Name, String.Empty).CompareTo(If(y.Name, String.Empty))
+                     End Function)
 
         For Each tagItem In tags
             tagList.Add(tagItem)
         Next
         tagList = tagList.Distinct.ToList
-        tagList.Sort()
+        tagList.Sort(Function(x, y)
+                         Return If(x.Name, String.Empty).CompareTo(If(y.Name, String.Empty))
+                     End Function)
 
         titles = titles.Distinct.ToList
         Dim names As New List(Of String)
