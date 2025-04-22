@@ -1,7 +1,12 @@
 ﻿Imports System.ComponentModel
 Imports System.ComponentModel.DataAnnotations
+Imports System.Deployment.Application
 Imports System.Environment
+Imports System.Globalization
 Imports System.Runtime.CompilerServices
+Imports System.Security
+Imports System.Security.Policy
+Imports System.Text
 Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports Csv
@@ -26,6 +31,8 @@ Public Class Form1 : Implements INotifyPropertyChanged
     Private WithEvents _Presenter As New LibraryToolPresenter
 
     Private _Context As SynchronizationContext
+
+    Private _ErrorIcon As DevExpress.Utils.Svg.SvgImage
 
     ReadOnly Property LibraryTabIsVisible As Boolean
         Get
@@ -72,11 +79,16 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
 #If DEBUG Then
         If Not Debugger.IsAttached Then MsgBox("Attach Debugger")
-
+#Else
+        'BarButtonItemRefreshMetadataSelected.Visibility = BarItemVisibility.Never
+        BarButtonItemRefreshMetadataAll.Visibility = BarItemVisibility.Never
 #End If
+        _ErrorIcon = BarStaticItemMessage.ImageOptions.SvgImage
+
         If Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
             Try
                 Me.Text &= $" v{Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion:4}"
+                Me.BarStaticItemVersion.Caption = $"HCS Library Tool v{Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion:4}"
             Catch ex As Exception
             End Try
         End If
@@ -97,6 +109,8 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
         If Not Await _Presenter.Initialize() Then
             Exit Sub
+        Else
+            CheckForUpdateAndApply(True)
         End If
 
     End Sub
@@ -116,7 +130,7 @@ Public Class Form1 : Implements INotifyPropertyChanged
             _CloseInProgress = False
         End If
 
-        If _Presenter.LibraryHasChanges Then
+        If _Presenter.LibraryIsLoaded AndAlso _Presenter.LibraryHasChanges Then
             Select Case DevExpress.XtraEditors.XtraMessageBox.Show("Do you want to save Library changes?", "Unsaved Changes", MessageBoxButtons.YesNoCancel)
                 Case DialogResult.Yes
                     SaveLibraryAndExit()
@@ -880,19 +894,25 @@ Public Class Form1 : Implements INotifyPropertyChanged
     End Sub
 
     Private Function DetermineCsvFormat(fileName As String) As CsvFormats
-        Dim csvText = IO.File.ReadAllText(fileName)
+        Try
+            Dim csvText = IO.File.ReadAllText(fileName)
 
-        For Each line In Csv.CsvReader.ReadFromText(csvText, New CsvOptions() With {.AllowNewLineInEnclosedFieldValues = True})
-            If line.Headers.Count = 20 AndAlso line.Headers(0) = "Mark" Then
-                Return CsvFormats.Holdings
-            ElseIf line.Headers.Count = 19 AndAlso line.Headers(0) = "Timestamp" Then
-                Return CsvFormats.Recommendation
-            ElseIf line.Headers.Count = 3 AndAlso line.Headers(0) = "Piece" Then
-                Return CsvFormats.Repertoire
-            End If
+            For Each line In Csv.CsvReader.ReadFromText(csvText, New CsvOptions() With {.AllowNewLineInEnclosedFieldValues = True})
+                If line.Headers.Count = 20 AndAlso line.Headers(0) = "Mark" Then
+                    Return CsvFormats.Holdings
+                ElseIf line.Headers.Count = 19 AndAlso line.Headers(0) = "Timestamp" Then
+                    Return CsvFormats.Recommendation
+                ElseIf line.Headers.Count = 3 AndAlso line.Headers(0) = "Piece" Then
+                    Return CsvFormats.Repertoire
+                End If
 
-        Next
+            Next
+
+        Catch ex As IO.IOException
+            DevExpress.XtraEditors.XtraMessageBox.Show("The selected file could not be opened, if it is opened in Excel, please close it before importing.", "Import Error")
+        End Try
         Return CsvFormats.None
+
     End Function
 
     Private Sub LoadHoldingsCsv(fileName As String)
@@ -936,7 +956,7 @@ Public Class Form1 : Implements INotifyPropertyChanged
 #Region "Error Messages"
 
     Private WithEvents _timerHideStatusBarMessage As New Windows.Forms.Timer() With {.Interval = 10000}
-    Private _StatusBarErrors As New Queue(Of String)
+    Private _StatusBarMessageQueue As New Queue(Of (Message As String, Interval As Integer, IsError As Boolean))
 
     Private Sub OnPresenterError(sender As Object, args As ErrorCodeEventArgs) Handles _Presenter.ErrorOccurred
         _Context.Post(Sub(e As ErrorCodeEventArgs)
@@ -1057,7 +1077,7 @@ Public Class Form1 : Implements INotifyPropertyChanged
                     actions(result).Invoke()
                 End If
             Case ErrorCodeEventArgs.ShowModes.StatusBar
-                QueueStatusBarErrorMessage(messageText)
+                QueueStatusBarMessage(messageText, True)
         End Select
 
         If e.Critical Then
@@ -1065,8 +1085,8 @@ Public Class Form1 : Implements INotifyPropertyChanged
         End If
     End Sub
 
-    Private Sub QueueStatusBarErrorMessage(messageText As String)
-        _StatusBarErrors.Enqueue(messageText)
+    Private Sub QueueStatusBarMessage(messageText As String, isError As Boolean, Optional intervalMs As Integer = 10000)
+        _StatusBarMessageQueue.Enqueue((messageText, Math.Max(1, intervalMs), isError))
         ProcessStatusBarMessageQueue()
     End Sub
 
@@ -1079,9 +1099,18 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
     Private Sub SetNextStatusBarMessage()
         _timerHideStatusBarMessage.Stop()
-        If _StatusBarErrors.Count > 0 Then
+        If _StatusBarMessageQueue.Count > 0 Then
             Me.BarStaticItemMessage.Visibility = BarItemVisibility.Always
-            Me.BarStaticItemMessage.Caption = _StatusBarErrors.Dequeue
+            Dim nextMessage = _StatusBarMessageQueue.Dequeue
+
+            If nextMessage.IsError Then
+                Me.BarStaticItemMessage.ImageOptions.SvgImage = _ErrorIcon
+            Else
+                Me.BarStaticItemMessage.ImageOptions.SvgImage = Nothing
+            End If
+            Me.BarStaticItemMessage.Caption = nextMessage.Message
+            _timerHideStatusBarMessage.Interval = nextMessage.Interval
+
             _timerHideStatusBarMessage.Start()
         Else
             Me.BarStaticItemMessage.Visibility = BarItemVisibility.Never
@@ -1200,16 +1229,31 @@ Public Class Form1 : Implements INotifyPropertyChanged
     Private _ContextMenuItem As Recommendation
 
     Private Sub GridViewLibrary_PopupMenuShowing(sender As Object, e As PopupMenuShowingEventArgs) Handles GridViewLibrary.PopupMenuShowing
+        If e.HitInfo.InGroupRow Then
+            If e.Menu Is Nothing Then
+                Dim newMenu As New DevExpress.XtraGrid.Menu.GridViewMenu(GridViewLibrary)
+                e.Menu = newMenu
+            End If
 
-        Dim contextMenuItem As Recommendation = GridViewLibrary.GetRow(e.HitInfo.RowHandle)
-        If contextMenuItem Is Nothing Then Exit Sub
+            Dim expandAllItem As New DevExpress.Utils.Menu.DXMenuItem("Expand All")
+            AddHandler expandAllItem.Click, Sub() GridViewLibrary.ExpandAllGroups()
 
-        _ContextMenuItem = contextMenuItem
+            Dim collapseAllItem As New DevExpress.Utils.Menu.DXMenuItem("Collapse All")
+            AddHandler collapseAllItem.Click, Sub() GridViewLibrary.CollapseAllGroups()
 
-        Dim isChecked As Boolean = _Presenter.GetSeasonPlannerContainsItem(_ContextMenuItem)
-        Dim addToSeasonItem As New DevExpress.Utils.Menu.DXMenuCheckItem("Include Season Planner", isChecked)
-        AddHandler addToSeasonItem.CheckedChanged, AddressOf OnSeasonItemCheckedChangedHandler
-        e.Menu.Items.Add(addToSeasonItem)
+            e.Menu.Items.Add(expandAllItem)
+            e.Menu.Items.Add(collapseAllItem)
+        ElseIf e.HitInfo.InRow Then
+            Dim contextMenuItem As Recommendation = GridViewLibrary.GetRow(e.HitInfo.RowHandle)
+            If contextMenuItem Is Nothing Then Exit Sub
+
+            _ContextMenuItem = contextMenuItem
+
+            Dim isChecked As Boolean = _Presenter.GetSeasonPlannerContainsItem(_ContextMenuItem)
+            Dim addToSeasonItem As New DevExpress.Utils.Menu.DXMenuCheckItem("Include Season Planner", isChecked)
+            AddHandler addToSeasonItem.CheckedChanged, AddressOf OnSeasonItemCheckedChangedHandler
+            e.Menu.Items.Add(addToSeasonItem)
+        End If
     End Sub
 
     Private Sub OnSeasonItemCheckedChangedHandler(sender As Object, e As EventArgs)
@@ -1306,12 +1350,19 @@ Public Class Form1 : Implements INotifyPropertyChanged
 
 #Region "Metadata Fetch"
 
-    Private _Metadatas As New ComposerMetadatas
+    Private _ComposerMetadatas As New ComposerMetadatas
+    Private _WorkMetadatas As New WorkMetadatas
 
     Private Sub BarButtonItemRefreshMetadataAll_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemRefreshMetadataAll.ItemClick
         For Each rec In _Presenter.Library
             rec.HasMetadataFromComposer = False
-            PopulateMetadata(rec)
+            rec.HasMetadataFromTitle = False
+            Try
+                PopulateMetadata(rec)
+            Catch ex As Exception
+                ' Cancel
+                Exit For
+            End Try
         Next
     End Sub
 
@@ -1326,48 +1377,237 @@ Public Class Form1 : Implements INotifyPropertyChanged
         If selections.Count > 0 Then
             For Each rec In selections
                 rec.HasMetadataFromComposer = False
-                PopulateMetadata(rec)
+                rec.HasMetadataFromTitle = False
+                Try
+                    PopulateMetadata(rec)
+                Catch ex As Exception
+                    ' Cancel
+                    Exit For
+                End Try
             Next
         End If
-
     End Sub
 
     Private Sub PopulateMetadata(rec As Recommendation)
-        If rec.HasMetadataFromComposer Then Exit Sub
+        Dim composerMetadata As ComposerMetadata = Nothing
+        Dim workMetadata As WorkMetadata = Nothing
 
-        Dim composer = _Presenter.Composers.FindComposer(rec)
-        If composer IsNot Nothing Then
-            rec.HasMetadataFromComposer = True
+        Try
+            If rec.HasMetadataFromComposer Then Exit Sub
+            Dim composer = _Presenter.Composers.FindComposer(rec)
+            If composer IsNot Nothing Then
+                rec.HasMetadataFromComposer = True
 
-            Dim composerMetadata As ComposerMetadata = GetComposerMetadata(composer)
+                composerMetadata = GetComposerMetadata(composer)
+                If composerMetadata IsNot Nothing Then
+                    If composerMetadata.Metadata Is Nothing Then Exit Sub
+
+                    composer.MetadataId = composerMetadata.Metadata.id
+
+                    If Not rec.HasMetadataFromTitle Then
+                        rec.HasMetadataFromTitle = True
+
+                        workMetadata = GetWorkMetadata(rec, composer)
+
+                        If workMetadata IsNot Nothing Then
+                            If workMetadata.Metadata Is Nothing Then Exit Sub
+
+                            rec.MetadataId = workMetadata.Metadata.id
+                        End If
+                    End If
+                End If
+            End If
+
             If composerMetadata IsNot Nothing Then
-                If composerMetadata.Metadata Is Nothing Then Exit Sub
-
                 Dim foundEra = _Presenter.Eras.Find(composerMetadata.Metadata.epoch)
 
                 Dim shouldReplaceEra As Boolean = True
                 If composer.Era IsNot Nothing AndAlso composer.Era.Name <> Nothing Then
                     shouldReplaceEra = False
                     If Not composer.Era.Equals(foundEra) Then
-                        If DevExpress.XtraEditors.XtraMessageBox.Show($"Replace era {composer.Era.Name} with {foundEra.Name} for {composer.PrimaryName}?", "Replace Era?", MessageBoxButtons.YesNo) = DialogResult.Yes Then
-                            shouldReplaceEra = True
-                        End If
+                        Select Case DevExpress.XtraEditors.XtraMessageBox.Show($"Replace era {composer.Era.Name} with {foundEra.Name} for {composer.PrimaryName}?", "Replace Era?", MessageBoxButtons.YesNoCancel)
+                            Case DialogResult.Yes
+                                shouldReplaceEra = True
+                            Case DialogResult.No
+                                shouldReplaceEra = False
+                            Case Else
+                                ' Cancel
+                                Throw New Exception("Cancellation")
+                        End Select
                     End If
                 End If
                 If shouldReplaceEra Then composer.Era = foundEra
-                composer.MetadataId = composerMetadata.Metadata.id
-
                 If foundEra IsNot Nothing Then
                     rec.Era = composer.Era
                 End If
             End If
-        End If
+            If workMetadata IsNot Nothing Then
+                Dim shouldReplaceTitle As Boolean = True
+                If rec.Title <> Nothing Then
+                    shouldReplaceTitle = False
+                    If Not rec.Title.Equals(workMetadata.Metadata.title) Then
+                        Select Case DevExpress.XtraEditors.XtraMessageBox.Show($"Replace title '{rec.Title}' with '{workMetadata.Metadata.title}'?", "Replace Title?", MessageBoxButtons.YesNoCancel)
+                            Case DialogResult.Yes
+                                shouldReplaceTitle = True
+                            Case DialogResult.No
+                                shouldReplaceTitle = False
+                            Case Else
+                                ' Cancel
+                                Throw New Exception("Cancellation")
+                        End Select
+                    End If
+                End If
+                If shouldReplaceTitle Then
+                    Dim oldTitle = rec.Title
+                    If Not rec.AlternateTitleSpellings.Contains(oldTitle) Then
+                        rec.AlternateTitleSpellings.Add(oldTitle)
+                    End If
+                    rec.Title = workMetadata.Metadata.title
+                Else
+                    If Not rec.AlternateTitleSpellings.Contains(workMetadata.Metadata.title) Then
+                        rec.AlternateTitleSpellings.Add(workMetadata.Metadata.title)
+                    End If
+                End If
+
+                Dim foundTag = _Presenter.Tags.Find(workMetadata.Metadata.genre)
+
+                If foundTag IsNot Nothing AndAlso rec.Tags IsNot Nothing Then
+                    If rec.Tags.Find(foundTag) Is Nothing Then
+                        rec.Tags.Add(foundTag)
+                    End If
+                End If
+            End If
+        Finally
+            If workMetadata IsNot Nothing Then
+                QueueStatusBarMessage($"Retrieved Metadata for {rec}", False, 3000)
+            Else
+                QueueStatusBarMessage($"No match found for {rec}", True, 10000)
+            End If
+        End Try
+
     End Sub
 
     Private Function GetComposerMetadata(composer As ComposerAlias) As ComposerMetadata
-        Dim metadata = _Metadatas.GetMetadata(composer)
-        _Metadatas.Add(metadata)
+        Dim metadata = _ComposerMetadatas.GetMetadata(composer)
+        If metadata Is Nothing Then Return Nothing
+
+        _ComposerMetadatas.Add(metadata)
         Return metadata
+    End Function
+
+    Private Function GetWorkMetadata(rec As Recommendation, composer As ComposerAlias) As WorkMetadata
+        Dim metadata = _WorkMetadatas.GetMetadata(rec, composer)
+        If metadata Is Nothing Then Return Nothing
+
+        _WorkMetadatas.Add(metadata)
+        Return metadata
+    End Function
+
+    Private Sub BarButtonItem2_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemViewDocumentation.ItemClick
+        Process.Start("https://docs.google.com/document/d/1H_WCUtz6nCjn5WMp1eDRa-292tDWeAw2KcZOby6VvTA/edit?usp=sharing")
+    End Sub
+
+    Private Sub BarButtonItemCheckForUpdate_ItemClick(sender As Object, e As ItemClickEventArgs) Handles BarButtonItemCheckForUpdate.ItemClick
+        CheckForUpdateAndApply(False)
+    End Sub
+
+    Private Sub CheckForUpdateAndApply(askToApply As Boolean)
+        If Not Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then Exit Sub
+
+        Me.ShowMarqueeProgress("Checking for update…")
+        Dim client As New Net.WebClient()
+        client.CachePolicy = New Net.Cache.RequestCachePolicy(Net.Cache.RequestCacheLevel.NoCacheNoStore)
+        client.DownloadFile("https://joedombrowski.com/apps/hcs-library-tool/HcsLibraryTool.application", "test.application")
+
+        Dim progressIsMarquee As Boolean = True
+        Dim inPlaceHostingManager = New InPlaceHostingManager(Deployment.Application.ApplicationDeployment.CurrentDeployment.UpdateLocation, False)
+        AddHandler inPlaceHostingManager.GetManifestCompleted,
+            Sub(sender2 As Object, e2 As GetManifestCompletedEventArgs)
+                HideProgress()
+
+                If e2.Version > Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion Then
+                    If askToApply Then
+                        If DevExpress.XtraEditors.XtraMessageBox.Show("A new version of this application was found. Would you like to update?", "Update Available", MessageBoxButtons.YesNo) <> DialogResult.Yes Then
+                            Exit Sub
+                        End If
+                    End If
+
+                    DirectCast(sender2, InPlaceHostingManager).AssertApplicationRequirements(True)
+                    progressIsMarquee = False
+                    DirectCast(sender2, InPlaceHostingManager).DownloadApplicationAsync()
+                ElseIf Not askToApply Then
+                    QueueStatusBarMessage("No update found, you are on the latest version.", False)
+                End If
+            End Sub
+
+        AddHandler inPlaceHostingManager.DownloadProgressChanged,
+            Sub(sender2 As Object, e2 As DownloadProgressChangedEventArgs)
+                If Not progressIsMarquee Then
+                    ShowProgresss(0, 100, e2.ProgressPercentage, "Downloading Update…")
+                End If
+            End Sub
+
+        AddHandler inPlaceHostingManager.DownloadApplicationCompleted,
+            Sub(sender2 As Object, e2 As DownloadApplicationCompletedEventArgs)
+                HideProgress()
+                If Not e2.Cancelled AndAlso e2.Error Is Nothing Then
+                    QueueStatusBarMessage("Update ready, restart to apply.", False)
+                Else
+                    QueueStatusBarMessage("Update failed!", True)
+                End If
+            End Sub
+        inPlaceHostingManager.GetManifestAsync()
+    End Sub
+
+    Private Sub GridViewLibrary_CustomRowFilter(sender As Object, e As Views.Base.RowFilterEventArgs) Handles GridViewLibrary.CustomRowFilter
+        If e.Visible Then Exit Sub
+        If GridViewLibrary.FindFilterText = Nothing OrElse GridViewLibrary.FindFilterText.Trim = Nothing Then
+            e.Visible = True
+            e.Handled = True
+            Exit Sub
+        End If
+
+        Dim thisRow As Recommendation = _Presenter.Library(e.ListSourceRow)
+        Dim colValues = New List(Of String) From {thisRow.Arranger, thisRow.Composer, If(thisRow.Era?.ToString, ""), thisRow.MetadataId.ToString, thisRow.Title}
+        colValues.AddRange(thisRow.Tags.Select(Function(x) x.Name))
+        colValues.AddRange(thisRow.AlternateTitleSpellings)
+        Dim colValuesNoAccents = colValues.Where(Function(s) s <> Nothing).Select(Function(x) RemoveDiacritics(x)).ToList
+
+        For Each columnValue In String.Join(" ", colValuesNoAccents).Split(" ")
+            For Each filterValue As String In If(GridViewLibrary.FindFilterText?.Split(" "), "")
+                If columnValue.ToLowerInvariant.Contains(filterValue.ToLowerInvariant) Then
+                    e.Visible = True
+                    e.Handled = True
+                    Exit Sub
+                End If
+            Next
+        Next
+
+
+
+        'Dim score = Extensions.StringExtensions.GetSimilarityScore(String.Join(" ", colValuesNoAccents), GridViewLibrary.FindFilterText, True)
+        'e.Visible = score.HighestSingleMatchScore > 98
+        'e.Handled = True
+    End Sub
+
+    Private Shared Function RemoveDiacritics(text As String) As String
+        Dim returnString = text
+        returnString = returnString.Replace("ł", "l").Replace("Ł", "L").Replace("ø", "o").Replace("Ø", "O").Replace("æ", "ae").Replace("Æ", "Ae")
+
+        Dim normalizedString = returnString.Normalize(NormalizationForm.FormD)
+        Dim stringBuilder = New StringBuilder(capacity:=normalizedString.Length)
+
+        For i = 0 To normalizedString.Length - 1
+
+            Dim c As Char = normalizedString(i)
+            Dim unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c)
+            If unicodeCategory <> UnicodeCategory.NonSpacingMark Then
+                stringBuilder.Append(c)
+            End If
+        Next
+
+        Return stringBuilder.ToString().Normalize(NormalizationForm.FormC)
+
     End Function
 
 #End Region

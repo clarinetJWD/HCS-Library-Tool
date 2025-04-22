@@ -27,10 +27,14 @@ Public Interface IComposer : Inherits INotifyPropertyChanged
     Property Composer As String
 End Interface
 
-Public Interface IComposerMetadata : Inherits INotifyPropertyChanged
+Public Interface IComposerMetadata : Inherits IMetadataId
     Property Era As Era
+End Interface
+
+Public Interface IMetadataId : Inherits INotifyPropertyChanged
     Property MetadataId As Integer
 End Interface
+
 
 Public Interface IArranger : Inherits INotifyPropertyChanged
     Property Arranger As String

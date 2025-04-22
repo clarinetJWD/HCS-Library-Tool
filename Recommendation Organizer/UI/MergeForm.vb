@@ -9,13 +9,14 @@ Public Class MergeForm
     ReadOnly Property OriginalComposerAliases As ComposerAliases
 
     Sub Initialize(recommendations As IEnumerable(Of Recommendation), composerAliases As ComposerAliases, eras As Eras, tags As Tags)
+        Me.IconOptions.SvgImage = Global.HcsLibraryTool.My.Resources.Resources.hcs_icon
 
         _recommendations = recommendations
         _OriginalComposerAliases = New ComposerAliases
         Dim titles As New List(Of String)
         Dim aliases As New ComposerAliases
         Dim eraList As New List(Of Era)
-        Dim selectedEra As String = Nothing
+        Dim selectedEra As Era = Nothing
         Dim tagList As New List(Of Tag)
         Dim selectedTags As New List(Of Tag)
         Dim selectedDifficulty As Difficulties = Difficulties.NotSet
@@ -44,7 +45,9 @@ Public Class MergeForm
             End If
 
             If rec.Era <> Nothing Then
-                eraList.Add(rec.Era)
+                If eraList.Find(Function(x) x.Id = rec.Era.Id) Is Nothing Then
+                    eraList.Add(rec.Era)
+                End If
                 selectedEra = rec.Era
             End If
 
@@ -73,7 +76,9 @@ Public Class MergeForm
         Next
 
         For Each era In eras
-            eraList.Add(era)
+            If eraList.Find(Function(x) x.Id = era.Id) Is Nothing Then
+                eraList.Add(era)
+            End If
         Next
         eraList = eraList.Distinct.ToList
         eraList.Sort(Function(x, y)
@@ -112,9 +117,7 @@ Public Class MergeForm
             Me.ComboBoxEditEras.SelectedIndex = 0
         End If
 
-        For Each tagItem In tagList
-            Me.CheckedComboBoxEditTags.Properties.Items.Add(tagItem)
-        Next
+        TagsBindingSource.DataSource = tagList
         If selectedTags IsNot Nothing AndAlso selectedTags.Count > 0 Then
             For Each item As DevExpress.XtraEditors.Controls.CheckedListBoxItem In Me.CheckedComboBoxEditTags.Properties.Items
                 If selectedTags.Contains(item.Value) Then
@@ -131,6 +134,7 @@ Public Class MergeForm
         Dim difficulty As Difficulties = ComboBoxEditDifficulty.EditValue
         Dim era As String = ComboBoxEditEras.EditValue
         Dim tags As New Tags
+
         If CheckedComboBoxEditTags.EditValue IsNot Nothing Then
             For Each tagItem In CheckedComboBoxEditTags.EditValue
                 tags.Add(tagItem)

@@ -53,7 +53,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
             Dim success As Boolean = True
             Dim needsSave As Boolean = False
 
-            success = Await HttpDownloadFileAsync(LocalPath_Library, HttpPath_Library, True, "Loading Library...")
+            success = Await Task.Run(Function() FtpDownloadFile(LocalPath_Library, FtpPath_Library, True, "Loading Library...", 5))
 
             Dim newLibraryData As LibraryData = Await Task.Run(
                 Function()
@@ -163,7 +163,7 @@ Public Class LibraryToolModel : Implements INotifyPropertyChanged
                     End Using
 
                     ' Check if server file is newer than your file.
-                    Dim successTask = HttpDownloadFileAsync(LocalPath_Library_Temp("temp"), HttpPath_Library, True, "Saving Library...")
+                    Dim successTask = Task.Run(Function() FtpDownloadFile(LocalPath_Library_Temp("temp"), FtpPath_Library, True, "Saving Library...", 5))
                     Dim success As Boolean = successTask.Result
 
                     If success Then

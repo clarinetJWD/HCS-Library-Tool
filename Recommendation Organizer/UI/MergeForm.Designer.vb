@@ -19,6 +19,8 @@ Partial Class MergeForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MergeForm))
         Me.LayoutControl1 = New DevExpress.XtraLayout.LayoutControl()
         Me.ComboBoxEditDifficulty = New DevExpress.XtraEditors.ImageComboBoxEdit()
         Me.CheckedComboBoxEditTags = New DevExpress.XtraEditors.CheckedComboBoxEdit()
@@ -39,6 +41,7 @@ Partial Class MergeForm
         Me.LayoutControlItemEra = New DevExpress.XtraLayout.LayoutControlItem()
         Me.LayoutControlItemTags = New DevExpress.XtraLayout.LayoutControlItem()
         Me.LayoutControlItemDifficulty = New DevExpress.XtraLayout.LayoutControlItem()
+        Me.TagsBindingSource = New System.Windows.Forms.BindingSource(Me.components)
         CType(Me.LayoutControl1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.LayoutControl1.SuspendLayout()
         CType(Me.ComboBoxEditDifficulty.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -58,6 +61,7 @@ Partial Class MergeForm
         CType(Me.LayoutControlItemEra, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LayoutControlItemTags, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LayoutControlItemDifficulty, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TagsBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'LayoutControl1
@@ -90,9 +94,12 @@ Partial Class MergeForm
         '
         'CheckedComboBoxEditTags
         '
+        Me.CheckedComboBoxEditTags.EditValue = CType(resources.GetObject("CheckedComboBoxEditTags.EditValue"), Object)
         Me.CheckedComboBoxEditTags.Location = New System.Drawing.Point(141, 132)
         Me.CheckedComboBoxEditTags.Name = "CheckedComboBoxEditTags"
         Me.CheckedComboBoxEditTags.Properties.Buttons.AddRange(New DevExpress.XtraEditors.Controls.EditorButton() {New DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)})
+        Me.CheckedComboBoxEditTags.Properties.DataSource = Me.TagsBindingSource
+        Me.CheckedComboBoxEditTags.Properties.EditValueType = DevExpress.XtraEditors.Repository.EditValueTypeCollection.List
         Me.CheckedComboBoxEditTags.Size = New System.Drawing.Size(277, 20)
         Me.CheckedComboBoxEditTags.StyleController = Me.LayoutControl1
         Me.CheckedComboBoxEditTags.TabIndex = 9
@@ -253,6 +260,10 @@ Partial Class MergeForm
         Me.LayoutControlItemDifficulty.Text = "Difficulty"
         Me.LayoutControlItemDifficulty.TextSize = New System.Drawing.Size(117, 13)
         '
+        'TagsBindingSource
+        '
+        Me.TagsBindingSource.DataSource = GetType(HcsLibraryTool.Tags)
+        '
         'MergeForm
         '
         Me.AcceptButton = Me.SimpleButtonSave
@@ -261,7 +272,6 @@ Partial Class MergeForm
         Me.CancelButton = Me.SimpleButtonCancel
         Me.ClientSize = New System.Drawing.Size(430, 211)
         Me.Controls.Add(Me.LayoutControl1)
-        Me.IconOptions.SvgImage = Global.HcsLibraryTool.My.Resources.Resources.hcs_icon
         Me.KeyPreview = True
         Me.Name = "MergeForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
@@ -285,6 +295,7 @@ Partial Class MergeForm
         CType(Me.LayoutControlItemEra, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LayoutControlItemTags, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LayoutControlItemDifficulty, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TagsBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -309,4 +320,5 @@ Partial Class MergeForm
     Friend WithEvents LayoutControlItemTags As DevExpress.XtraLayout.LayoutControlItem
     Friend WithEvents ComboBoxEditDifficulty As DevExpress.XtraEditors.ImageComboBoxEdit
     Friend WithEvents LayoutControlItemDifficulty As DevExpress.XtraLayout.LayoutControlItem
+    Friend WithEvents TagsBindingSource As BindingSource
 End Class

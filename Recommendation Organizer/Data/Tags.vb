@@ -100,6 +100,7 @@ Public Class Tag : Inherits NameIdBase
     End Property
 
     Shared Widening Operator CType(value As String) As Tag
+        If value = Nothing Then Return Nothing
         Return New Tag(value)
     End Operator
 

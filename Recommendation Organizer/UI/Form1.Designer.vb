@@ -33,17 +33,22 @@ Partial Class Form1
         Me.BarButtonItemImportFromCsv = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemFileMetadata = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemFileSeason = New DevExpress.XtraBars.BarSubItem()
+        Me.BarButtonItemNewSeason = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemLoadSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemPublishSeason = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemDeleteSeason = New DevExpress.XtraBars.BarSubItem()
-        Me.BarButtonItemNewSeason = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemEditLibrary = New DevExpress.XtraBars.BarSubItem()
         Me.BarButtonItemMergeSelected = New DevExpress.XtraBars.BarButtonItem()
         Me.BarButtonItemRefreshMetadataAll = New DevExpress.XtraBars.BarButtonItem()
         Me.BarButtonItemRefreshMetadataSelected = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemEditMetadata = New DevExpress.XtraBars.BarSubItem()
         Me.BarSubItemEditSeason = New DevExpress.XtraBars.BarSubItem()
+        Me.BarButtonItemClearSeasonPlanner = New DevExpress.XtraBars.BarButtonItem()
         Me.BarSubItemLayoutMenu = New DevExpress.XtraBars.BarSubItem()
+        Me.BarSubItemHelp = New DevExpress.XtraBars.BarSubItem()
+        Me.BarButtonItemCheckForUpdate = New DevExpress.XtraBars.BarButtonItem()
+        Me.BarButtonItemViewDocumentation = New DevExpress.XtraBars.BarButtonItem()
+        Me.BarStaticItemVersion = New DevExpress.XtraBars.BarStaticItem()
         Me.BarStatus = New DevExpress.XtraBars.Bar()
         Me.BarEditItemProgressBar = New DevExpress.XtraBars.BarEditItem()
         Me.RepositoryItemProgressBar1 = New DevExpress.XtraEditors.Repository.RepositoryItemProgressBar()
@@ -104,7 +109,6 @@ Partial Class Form1
         Me.DragDropEvents2 = New DevExpress.Utils.DragDrop.DragDropEvents(Me.components)
         Me.DragDropEvents1 = New DevExpress.Utils.DragDrop.DragDropEvents(Me.components)
         Me.BehaviorManager1 = New DevExpress.Utils.Behaviors.BehaviorManager(Me.components)
-        Me.BarButtonItemClearSeasonPlanner = New DevExpress.XtraBars.BarButtonItem()
         CType(Me.GridControlLibrary, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridViewLibrary, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BarManager1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -159,19 +163,23 @@ Partial Class Form1
         'GridControlLibrary
         '
         Me.GridControlLibrary.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GridControlLibrary.EmbeddedNavigator.Margin = New System.Windows.Forms.Padding(4)
         Me.GridControlLibrary.Location = New System.Drawing.Point(0, 0)
         Me.GridControlLibrary.MainView = Me.GridViewLibrary
+        Me.GridControlLibrary.Margin = New System.Windows.Forms.Padding(4)
         Me.GridControlLibrary.Name = "GridControlLibrary"
-        Me.GridControlLibrary.Size = New System.Drawing.Size(1206, 861)
+        Me.GridControlLibrary.Size = New System.Drawing.Size(1809, 1259)
         Me.GridControlLibrary.TabIndex = 0
         Me.GridControlLibrary.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewLibrary})
         '
         'GridViewLibrary
         '
         Me.GridViewLibrary.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
+        Me.GridViewLibrary.DetailHeight = 512
         Me.GridViewLibrary.GridControl = Me.GridControlLibrary
         Me.GridViewLibrary.Name = "GridViewLibrary"
         Me.GridViewLibrary.OptionsDetail.SmartDetailExpandButtonMode = DevExpress.XtraGrid.Views.Grid.DetailExpandButtonMode.CheckAllDetails
+        Me.GridViewLibrary.OptionsEditForm.PopupEditFormWidth = 1200
         Me.GridViewLibrary.OptionsLayout.StoreFormatRules = True
         Me.GridViewLibrary.OptionsMenu.ShowConditionalFormattingItem = True
         Me.GridViewLibrary.OptionsSelection.MultiSelect = True
@@ -184,9 +192,9 @@ Partial Class Form1
         Me.BarManager1.DockControls.Add(Me.barDockControlLeft)
         Me.BarManager1.DockControls.Add(Me.barDockControlRight)
         Me.BarManager1.Form = Me
-        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibrary, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarSubItemDeleteSeason, Me.BarButtonItemRefreshMetadataAll, Me.BarSubItemFileMetadata, Me.BarSubItemEditMetadata, Me.BarButtonItemRefreshMetadataSelected, Me.BarButtonItemNewSeason, Me.BarButtonItemClearSeasonPlanner})
+        Me.BarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.BarButtonItemMergeSelected, Me.BarButtonItemImportFromCsv, Me.BarSubItemFileLibrary, Me.BarButtonItemSaveAll, Me.BarSubItemEditLibrary, Me.BarEditItemProgressBar, Me.BarStaticItemLoadingCaption, Me.BarSubItemLayoutMenu, Me.BarSubItemFileSeason, Me.BarSubItemLoadSeason, Me.BarSubItemPublishSeason, Me.BarStaticItemMessage, Me.BarEditItemMarqueeProgressBar, Me.BarSubItemEditSeason, Me.BarSubItemDeleteSeason, Me.BarButtonItemRefreshMetadataAll, Me.BarSubItemFileMetadata, Me.BarSubItemEditMetadata, Me.BarButtonItemRefreshMetadataSelected, Me.BarButtonItemNewSeason, Me.BarButtonItemClearSeasonPlanner, Me.BarSubItemHelp, Me.BarButtonItemCheckForUpdate, Me.BarButtonItemViewDocumentation, Me.BarStaticItemVersion})
         Me.BarManager1.MainMenu = Me.BarMainMenu
-        Me.BarManager1.MaxItemId = 26
+        Me.BarManager1.MaxItemId = 30
         Me.BarManager1.RepositoryItems.AddRange(New DevExpress.XtraEditors.Repository.RepositoryItem() {Me.RepositoryItemProgressBar1, Me.RepositoryItemMarqueeProgressBar1})
         Me.BarManager1.StatusBar = Me.BarStatus
         '
@@ -196,7 +204,7 @@ Partial Class Form1
         Me.BarMainMenu.DockCol = 0
         Me.BarMainMenu.DockRow = 0
         Me.BarMainMenu.DockStyle = DevExpress.XtraBars.BarDockStyle.Top
-        Me.BarMainMenu.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileMetadata), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditMetadata), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemLayoutMenu)})
+        Me.BarMainMenu.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileMetadata), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemFileSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditLibrary), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditMetadata), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemEditSeason), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemLayoutMenu), New DevExpress.XtraBars.LinkPersistInfo(Me.BarSubItemHelp)})
         Me.BarMainMenu.OptionsBar.AllowQuickCustomization = False
         Me.BarMainMenu.OptionsBar.DisableClose = True
         Me.BarMainMenu.OptionsBar.DisableCustomization = True
@@ -241,6 +249,12 @@ Partial Class Form1
         Me.BarSubItemFileSeason.Name = "BarSubItemFileSeason"
         Me.BarSubItemFileSeason.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
         '
+        'BarButtonItemNewSeason
+        '
+        Me.BarButtonItemNewSeason.Caption = "New Season"
+        Me.BarButtonItemNewSeason.Id = 24
+        Me.BarButtonItemNewSeason.Name = "BarButtonItemNewSeason"
+        '
         'BarSubItemLoadSeason
         '
         Me.BarSubItemLoadSeason.Caption = "Load Published Season"
@@ -258,12 +272,6 @@ Partial Class Form1
         Me.BarSubItemDeleteSeason.Caption = "Delete Published Season"
         Me.BarSubItemDeleteSeason.Id = 18
         Me.BarSubItemDeleteSeason.Name = "BarSubItemDeleteSeason"
-        '
-        'BarButtonItemNewSeason
-        '
-        Me.BarButtonItemNewSeason.Caption = "New Season"
-        Me.BarButtonItemNewSeason.Id = 24
-        Me.BarButtonItemNewSeason.Name = "BarButtonItemNewSeason"
         '
         'BarSubItemEditLibrary
         '
@@ -287,7 +295,7 @@ Partial Class Form1
         '
         'BarButtonItemRefreshMetadataSelected
         '
-        Me.BarButtonItemRefreshMetadataSelected.Caption = "Refresh Metadata for Selected Item"
+        Me.BarButtonItemRefreshMetadataSelected.Caption = "Refresh Metadata for Selected Item(s)"
         Me.BarButtonItemRefreshMetadataSelected.Id = 23
         Me.BarButtonItemRefreshMetadataSelected.Name = "BarButtonItemRefreshMetadataSelected"
         '
@@ -305,12 +313,43 @@ Partial Class Form1
         Me.BarSubItemEditSeason.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemClearSeasonPlanner)})
         Me.BarSubItemEditSeason.Name = "BarSubItemEditSeason"
         '
+        'BarButtonItemClearSeasonPlanner
+        '
+        Me.BarButtonItemClearSeasonPlanner.Caption = "Clear Season Planner List"
+        Me.BarButtonItemClearSeasonPlanner.Id = 25
+        Me.BarButtonItemClearSeasonPlanner.Name = "BarButtonItemClearSeasonPlanner"
+        '
         'BarSubItemLayoutMenu
         '
         Me.BarSubItemLayoutMenu.Caption = "Layout"
         Me.BarSubItemLayoutMenu.Id = 8
         Me.BarSubItemLayoutMenu.Name = "BarSubItemLayoutMenu"
         Me.BarSubItemLayoutMenu.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
+        '
+        'BarSubItemHelp
+        '
+        Me.BarSubItemHelp.Caption = "Help"
+        Me.BarSubItemHelp.Id = 26
+        Me.BarSubItemHelp.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemCheckForUpdate), New DevExpress.XtraBars.LinkPersistInfo(Me.BarButtonItemViewDocumentation), New DevExpress.XtraBars.LinkPersistInfo(Me.BarStaticItemVersion)})
+        Me.BarSubItemHelp.Name = "BarSubItemHelp"
+        '
+        'BarButtonItemCheckForUpdate
+        '
+        Me.BarButtonItemCheckForUpdate.Caption = "Check for Update"
+        Me.BarButtonItemCheckForUpdate.Id = 27
+        Me.BarButtonItemCheckForUpdate.Name = "BarButtonItemCheckForUpdate"
+        '
+        'BarButtonItemViewDocumentation
+        '
+        Me.BarButtonItemViewDocumentation.Caption = "View Documentation"
+        Me.BarButtonItemViewDocumentation.Id = 28
+        Me.BarButtonItemViewDocumentation.Name = "BarButtonItemViewDocumentation"
+        '
+        'BarStaticItemVersion
+        '
+        Me.BarStaticItemVersion.Caption = "Version"
+        Me.BarStaticItemVersion.Id = 29
+        Me.BarStaticItemVersion.Name = "BarStaticItemVersion"
         '
         'BarStatus
         '
@@ -368,6 +407,7 @@ Partial Class Form1
         Me.BarStaticItemMessage.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
         Me.BarStaticItemMessage.Id = 14
         Me.BarStaticItemMessage.ImageOptions.SvgImage = CType(resources.GetObject("BarStaticItemMessage.ImageOptions.SvgImage"), DevExpress.Utils.Svg.SvgImage)
+        Me.BarStaticItemMessage.ImageOptions.SvgImageColorizationMode = DevExpress.Utils.SvgImageColorizationMode.CommonPalette
         Me.BarStaticItemMessage.Name = "BarStaticItemMessage"
         Me.BarStaticItemMessage.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph
         Me.BarStaticItemMessage.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
@@ -378,31 +418,35 @@ Partial Class Form1
         Me.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top
         Me.barDockControlTop.Location = New System.Drawing.Point(0, 0)
         Me.barDockControlTop.Manager = Me.BarManager1
-        Me.barDockControlTop.Size = New System.Drawing.Size(1206, 24)
+        Me.barDockControlTop.Margin = New System.Windows.Forms.Padding(4)
+        Me.barDockControlTop.Size = New System.Drawing.Size(1809, 34)
         '
         'barDockControlBottom
         '
         Me.barDockControlBottom.CausesValidation = False
         Me.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.barDockControlBottom.Location = New System.Drawing.Point(0, 912)
+        Me.barDockControlBottom.Location = New System.Drawing.Point(0, 1333)
         Me.barDockControlBottom.Manager = Me.BarManager1
-        Me.barDockControlBottom.Size = New System.Drawing.Size(1206, 26)
+        Me.barDockControlBottom.Margin = New System.Windows.Forms.Padding(4)
+        Me.barDockControlBottom.Size = New System.Drawing.Size(1809, 38)
         '
         'barDockControlLeft
         '
         Me.barDockControlLeft.CausesValidation = False
         Me.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left
-        Me.barDockControlLeft.Location = New System.Drawing.Point(0, 24)
+        Me.barDockControlLeft.Location = New System.Drawing.Point(0, 34)
         Me.barDockControlLeft.Manager = Me.BarManager1
-        Me.barDockControlLeft.Size = New System.Drawing.Size(0, 888)
+        Me.barDockControlLeft.Margin = New System.Windows.Forms.Padding(4)
+        Me.barDockControlLeft.Size = New System.Drawing.Size(0, 1299)
         '
         'barDockControlRight
         '
         Me.barDockControlRight.CausesValidation = False
         Me.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right
-        Me.barDockControlRight.Location = New System.Drawing.Point(1206, 24)
+        Me.barDockControlRight.Location = New System.Drawing.Point(1809, 34)
         Me.barDockControlRight.Manager = Me.BarManager1
-        Me.barDockControlRight.Size = New System.Drawing.Size(0, 888)
+        Me.barDockControlRight.Margin = New System.Windows.Forms.Padding(4)
+        Me.barDockControlRight.Size = New System.Drawing.Size(0, 1299)
         '
         'TabPane1
         '
@@ -410,12 +454,13 @@ Partial Class Form1
         Me.TabPane1.Controls.Add(Me.TabNavigationPageMetadata)
         Me.TabPane1.Controls.Add(Me.TabNavigationPageSeasonPlanner)
         Me.TabPane1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TabPane1.Location = New System.Drawing.Point(0, 24)
+        Me.TabPane1.Location = New System.Drawing.Point(0, 34)
+        Me.TabPane1.Margin = New System.Windows.Forms.Padding(4)
         Me.TabPane1.Name = "TabPane1"
         Me.TabPane1.Pages.AddRange(New DevExpress.XtraBars.Navigation.NavigationPageBase() {Me.TabNavigationPageLibrary, Me.TabNavigationPageMetadata, Me.TabNavigationPageSeasonPlanner})
-        Me.TabPane1.RegularSize = New System.Drawing.Size(1206, 888)
+        Me.TabPane1.RegularSize = New System.Drawing.Size(1809, 1299)
         Me.TabPane1.SelectedPage = Me.TabNavigationPageLibrary
-        Me.TabPane1.Size = New System.Drawing.Size(1206, 888)
+        Me.TabPane1.Size = New System.Drawing.Size(1809, 1299)
         Me.TabPane1.TabIndex = 6
         Me.TabPane1.Text = "TabPane1"
         '
@@ -423,15 +468,17 @@ Partial Class Form1
         '
         Me.TabNavigationPageLibrary.Caption = "Music List"
         Me.TabNavigationPageLibrary.Controls.Add(Me.GridControlLibrary)
+        Me.TabNavigationPageLibrary.Margin = New System.Windows.Forms.Padding(4)
         Me.TabNavigationPageLibrary.Name = "TabNavigationPageLibrary"
-        Me.TabNavigationPageLibrary.Size = New System.Drawing.Size(1206, 861)
+        Me.TabNavigationPageLibrary.Size = New System.Drawing.Size(1809, 1259)
         '
         'TabNavigationPageMetadata
         '
         Me.TabNavigationPageMetadata.Caption = "Manage Metadata"
         Me.TabNavigationPageMetadata.Controls.Add(Me.LayoutControlMetadata)
+        Me.TabNavigationPageMetadata.Margin = New System.Windows.Forms.Padding(4)
         Me.TabNavigationPageMetadata.Name = "TabNavigationPageMetadata"
-        Me.TabNavigationPageMetadata.Size = New System.Drawing.Size(1206, 861)
+        Me.TabNavigationPageMetadata.Size = New System.Drawing.Size(1809, 1258)
         '
         'LayoutControlMetadata
         '
@@ -441,9 +488,10 @@ Partial Class Form1
         Me.LayoutControlMetadata.Controls.Add(Me.GridControlComposers)
         Me.LayoutControlMetadata.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LayoutControlMetadata.Location = New System.Drawing.Point(0, 0)
+        Me.LayoutControlMetadata.Margin = New System.Windows.Forms.Padding(4)
         Me.LayoutControlMetadata.Name = "LayoutControlMetadata"
         Me.LayoutControlMetadata.Root = Me.LayoutControlGroupMetadataRoot
-        Me.LayoutControlMetadata.Size = New System.Drawing.Size(1206, 861)
+        Me.LayoutControlMetadata.Size = New System.Drawing.Size(1809, 1258)
         Me.LayoutControlMetadata.TabIndex = 2
         '
         'GridControlTags
@@ -455,11 +503,13 @@ Partial Class Form1
         Me.GridControlTags.EmbeddedNavigator.Buttons.NextPage.Visible = False
         Me.GridControlTags.EmbeddedNavigator.Buttons.Prev.Visible = False
         Me.GridControlTags.EmbeddedNavigator.Buttons.PrevPage.Visible = False
-        Me.GridControlTags.Location = New System.Drawing.Point(834, 12)
+        Me.GridControlTags.EmbeddedNavigator.Margin = New System.Windows.Forms.Padding(6)
+        Me.GridControlTags.Location = New System.Drawing.Point(1250, 12)
         Me.GridControlTags.MainView = Me.GridViewTags
+        Me.GridControlTags.Margin = New System.Windows.Forms.Padding(4)
         Me.GridControlTags.MenuManager = Me.BarManager1
         Me.GridControlTags.Name = "GridControlTags"
-        Me.GridControlTags.Size = New System.Drawing.Size(359, 836)
+        Me.GridControlTags.Size = New System.Drawing.Size(546, 1233)
         Me.GridControlTags.TabIndex = 4
         Me.GridControlTags.UseEmbeddedNavigator = True
         Me.GridControlTags.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewTags})
@@ -467,6 +517,7 @@ Partial Class Form1
         'GridViewTags
         '
         Me.GridViewTags.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
+        Me.GridViewTags.DetailHeight = 512
         Me.GridViewTags.GridControl = Me.GridControlTags
         Me.GridViewTags.Name = "GridViewTags"
         Me.GridViewTags.OptionsBehavior.AllowAddRows = DevExpress.Utils.DefaultBoolean.[True]
@@ -474,6 +525,7 @@ Partial Class Form1
         Me.GridViewTags.OptionsBehavior.AllowIncrementalSearch = True
         Me.GridViewTags.OptionsCustomization.AllowGroup = False
         Me.GridViewTags.OptionsDetail.SmartDetailExpandButtonMode = DevExpress.XtraGrid.Views.Grid.DetailExpandButtonMode.CheckAllDetails
+        Me.GridViewTags.OptionsEditForm.PopupEditFormWidth = 1200
         Me.GridViewTags.OptionsLayout.StoreFormatRules = True
         Me.GridViewTags.OptionsSelection.MultiSelect = True
         Me.GridViewTags.OptionsView.ShowGroupPanel = False
@@ -487,11 +539,13 @@ Partial Class Form1
         Me.GridControlEras.EmbeddedNavigator.Buttons.NextPage.Visible = False
         Me.GridControlEras.EmbeddedNavigator.Buttons.Prev.Visible = False
         Me.GridControlEras.EmbeddedNavigator.Buttons.PrevPage.Visible = False
-        Me.GridControlEras.Location = New System.Drawing.Point(439, 12)
+        Me.GridControlEras.EmbeddedNavigator.Margin = New System.Windows.Forms.Padding(6)
+        Me.GridControlEras.Location = New System.Drawing.Point(654, 12)
         Me.GridControlEras.MainView = Me.GridViewEras
+        Me.GridControlEras.Margin = New System.Windows.Forms.Padding(4)
         Me.GridControlEras.MenuManager = Me.BarManager1
         Me.GridControlEras.Name = "GridControlEras"
-        Me.GridControlEras.Size = New System.Drawing.Size(353, 836)
+        Me.GridControlEras.Size = New System.Drawing.Size(537, 1233)
         Me.GridControlEras.TabIndex = 1
         Me.GridControlEras.UseEmbeddedNavigator = True
         Me.GridControlEras.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewEras})
@@ -499,6 +553,7 @@ Partial Class Form1
         'GridViewEras
         '
         Me.GridViewEras.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
+        Me.GridViewEras.DetailHeight = 512
         Me.GridViewEras.GridControl = Me.GridControlEras
         Me.GridViewEras.Name = "GridViewEras"
         Me.GridViewEras.OptionsBehavior.AllowAddRows = DevExpress.Utils.DefaultBoolean.[True]
@@ -506,29 +561,34 @@ Partial Class Form1
         Me.GridViewEras.OptionsBehavior.AllowIncrementalSearch = True
         Me.GridViewEras.OptionsCustomization.AllowGroup = False
         Me.GridViewEras.OptionsDetail.SmartDetailExpandButtonMode = DevExpress.XtraGrid.Views.Grid.DetailExpandButtonMode.CheckAllDetails
+        Me.GridViewEras.OptionsEditForm.PopupEditFormWidth = 1200
         Me.GridViewEras.OptionsLayout.StoreFormatRules = True
         Me.GridViewEras.OptionsSelection.MultiSelect = True
         Me.GridViewEras.OptionsView.ShowGroupPanel = False
         '
         'GridControlComposers
         '
-        Me.GridControlComposers.Location = New System.Drawing.Point(39, 12)
+        Me.GridControlComposers.EmbeddedNavigator.Margin = New System.Windows.Forms.Padding(6)
+        Me.GridControlComposers.Location = New System.Drawing.Point(52, 12)
         Me.GridControlComposers.MainView = Me.GridViewComposers
+        Me.GridControlComposers.Margin = New System.Windows.Forms.Padding(4)
         Me.GridControlComposers.MenuManager = Me.BarManager1
         Me.GridControlComposers.Name = "GridControlComposers"
-        Me.GridControlComposers.Size = New System.Drawing.Size(358, 836)
+        Me.GridControlComposers.Size = New System.Drawing.Size(543, 1233)
         Me.GridControlComposers.TabIndex = 0
         Me.GridControlComposers.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewComposers})
         '
         'GridViewComposers
         '
         Me.GridViewComposers.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
+        Me.GridViewComposers.DetailHeight = 512
         Me.GridViewComposers.GridControl = Me.GridControlComposers
         Me.GridViewComposers.Name = "GridViewComposers"
         Me.GridViewComposers.OptionsBehavior.AllowIncrementalSearch = True
         Me.GridViewComposers.OptionsBehavior.Editable = False
         Me.GridViewComposers.OptionsCustomization.AllowGroup = False
         Me.GridViewComposers.OptionsDetail.SmartDetailExpandButtonMode = DevExpress.XtraGrid.Views.Grid.DetailExpandButtonMode.CheckAllDetails
+        Me.GridViewComposers.OptionsEditForm.PopupEditFormWidth = 1200
         Me.GridViewComposers.OptionsLayout.StoreFormatRules = True
         Me.GridViewComposers.OptionsSelection.MultiSelect = True
         Me.GridViewComposers.OptionsView.ShowGroupPanel = False
@@ -539,7 +599,7 @@ Partial Class Form1
         Me.LayoutControlGroupMetadataRoot.GroupBordersVisible = False
         Me.LayoutControlGroupMetadataRoot.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlGroupMetadataComposers, Me.LayoutControlGroupMetadataEras, Me.LayoutControlGroupMetadataTags})
         Me.LayoutControlGroupMetadataRoot.Name = "LayoutControlGroupMetadataRoot"
-        Me.LayoutControlGroupMetadataRoot.Size = New System.Drawing.Size(1206, 861)
+        Me.LayoutControlGroupMetadataRoot.Size = New System.Drawing.Size(1809, 1258)
         Me.LayoutControlGroupMetadataRoot.TextVisible = False
         '
         'LayoutControlGroupMetadataComposers
@@ -552,8 +612,8 @@ Partial Class Form1
         Me.LayoutControlGroupMetadataComposers.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlGroupMetadataComposers.Name = "LayoutControlGroupMetadataComposers"
         Me.LayoutControlGroupMetadataComposers.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupMetadataComposers.Size = New System.Drawing.Size(395, 841)
-        Me.LayoutControlGroupMetadataComposers.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 5, 0, 0)
+        Me.LayoutControlGroupMetadataComposers.Size = New System.Drawing.Size(595, 1238)
+        Me.LayoutControlGroupMetadataComposers.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 7, 0, 0)
         Me.LayoutControlGroupMetadataComposers.Text = "Composers"
         Me.LayoutControlGroupMetadataComposers.TextLocation = DevExpress.Utils.Locations.Left
         '
@@ -562,7 +622,7 @@ Partial Class Form1
         Me.LayoutControlItemMetadataComposersGrid.Control = Me.GridControlComposers
         Me.LayoutControlItemMetadataComposersGrid.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemMetadataComposersGrid.Name = "LayoutControlItemMetadataComposersGrid"
-        Me.LayoutControlItemMetadataComposersGrid.Size = New System.Drawing.Size(362, 840)
+        Me.LayoutControlItemMetadataComposersGrid.Size = New System.Drawing.Size(547, 1237)
         Me.LayoutControlItemMetadataComposersGrid.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemMetadataComposersGrid.TextVisible = False
         '
@@ -574,11 +634,11 @@ Partial Class Form1
         Me.LayoutControlGroupMetadataEras.ExpandOnDoubleClick = True
         Me.LayoutControlGroupMetadataEras.HeaderButtonsLocation = DevExpress.Utils.GroupElementLocation.AfterText
         Me.LayoutControlGroupMetadataEras.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemMetadataErasGrid})
-        Me.LayoutControlGroupMetadataEras.Location = New System.Drawing.Point(395, 0)
+        Me.LayoutControlGroupMetadataEras.Location = New System.Drawing.Point(595, 0)
         Me.LayoutControlGroupMetadataEras.Name = "LayoutControlGroupMetadataEras"
         Me.LayoutControlGroupMetadataEras.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupMetadataEras.Size = New System.Drawing.Size(395, 841)
-        Me.LayoutControlGroupMetadataEras.Spacing = New DevExpress.XtraLayout.Utils.Padding(5, 5, 0, 0)
+        Me.LayoutControlGroupMetadataEras.Size = New System.Drawing.Size(596, 1238)
+        Me.LayoutControlGroupMetadataEras.Spacing = New DevExpress.XtraLayout.Utils.Padding(7, 7, 0, 0)
         Me.LayoutControlGroupMetadataEras.Text = "Eras"
         Me.LayoutControlGroupMetadataEras.TextLocation = DevExpress.Utils.Locations.Left
         '
@@ -587,7 +647,7 @@ Partial Class Form1
         Me.LayoutControlItemMetadataErasGrid.Control = Me.GridControlEras
         Me.LayoutControlItemMetadataErasGrid.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemMetadataErasGrid.Name = "LayoutControlItemMetadataErasGrid"
-        Me.LayoutControlItemMetadataErasGrid.Size = New System.Drawing.Size(357, 840)
+        Me.LayoutControlItemMetadataErasGrid.Size = New System.Drawing.Size(541, 1237)
         Me.LayoutControlItemMetadataErasGrid.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemMetadataErasGrid.TextVisible = False
         '
@@ -599,11 +659,11 @@ Partial Class Form1
         Me.LayoutControlGroupMetadataTags.ExpandOnDoubleClick = True
         Me.LayoutControlGroupMetadataTags.HeaderButtonsLocation = DevExpress.Utils.GroupElementLocation.AfterText
         Me.LayoutControlGroupMetadataTags.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemMetadataTagsGrid})
-        Me.LayoutControlGroupMetadataTags.Location = New System.Drawing.Point(790, 0)
+        Me.LayoutControlGroupMetadataTags.Location = New System.Drawing.Point(1191, 0)
         Me.LayoutControlGroupMetadataTags.Name = "LayoutControlGroupMetadataTags"
         Me.LayoutControlGroupMetadataTags.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupMetadataTags.Size = New System.Drawing.Size(396, 841)
-        Me.LayoutControlGroupMetadataTags.Spacing = New DevExpress.XtraLayout.Utils.Padding(5, 0, 0, 0)
+        Me.LayoutControlGroupMetadataTags.Size = New System.Drawing.Size(598, 1238)
+        Me.LayoutControlGroupMetadataTags.Spacing = New DevExpress.XtraLayout.Utils.Padding(7, 0, 0, 0)
         Me.LayoutControlGroupMetadataTags.Text = "Tags"
         Me.LayoutControlGroupMetadataTags.TextLocation = DevExpress.Utils.Locations.Left
         '
@@ -612,7 +672,7 @@ Partial Class Form1
         Me.LayoutControlItemMetadataTagsGrid.Control = Me.GridControlTags
         Me.LayoutControlItemMetadataTagsGrid.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemMetadataTagsGrid.Name = "LayoutControlItemMetadataTagsGrid"
-        Me.LayoutControlItemMetadataTagsGrid.Size = New System.Drawing.Size(363, 840)
+        Me.LayoutControlItemMetadataTagsGrid.Size = New System.Drawing.Size(550, 1237)
         Me.LayoutControlItemMetadataTagsGrid.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemMetadataTagsGrid.TextVisible = False
         '
@@ -620,8 +680,9 @@ Partial Class Form1
         '
         Me.TabNavigationPageSeasonPlanner.Caption = "Season Planner"
         Me.TabNavigationPageSeasonPlanner.Controls.Add(Me.LayoutControlSeasonPlanner)
+        Me.TabNavigationPageSeasonPlanner.Margin = New System.Windows.Forms.Padding(4)
         Me.TabNavigationPageSeasonPlanner.Name = "TabNavigationPageSeasonPlanner"
-        Me.TabNavigationPageSeasonPlanner.Size = New System.Drawing.Size(1206, 861)
+        Me.TabNavigationPageSeasonPlanner.Size = New System.Drawing.Size(1809, 1258)
         '
         'LayoutControlSeasonPlanner
         '
@@ -636,15 +697,17 @@ Partial Class Form1
         Me.LayoutControlSeasonPlanner.Controls.Add(Me.GridControlSeasonPlanner)
         Me.LayoutControlSeasonPlanner.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LayoutControlSeasonPlanner.Location = New System.Drawing.Point(0, 0)
+        Me.LayoutControlSeasonPlanner.Margin = New System.Windows.Forms.Padding(4)
         Me.LayoutControlSeasonPlanner.Name = "LayoutControlSeasonPlanner"
         Me.LayoutControlSeasonPlanner.OptionsCustomizationForm.DesignTimeCustomizationFormPositionAndSize = New System.Drawing.Rectangle(3462, 418, 650, 400)
         Me.LayoutControlSeasonPlanner.Root = Me.Root
-        Me.LayoutControlSeasonPlanner.Size = New System.Drawing.Size(804, 574)
+        Me.LayoutControlSeasonPlanner.Size = New System.Drawing.Size(1809, 1258)
         Me.LayoutControlSeasonPlanner.TabIndex = 2
         '
         'TokenEditEras
         '
-        Me.TokenEditEras.Location = New System.Drawing.Point(238, 31)
+        Me.TokenEditEras.Location = New System.Drawing.Point(726, 60)
+        Me.TokenEditEras.Margin = New System.Windows.Forms.Padding(4)
         Me.TokenEditEras.Name = "TokenEditEras"
         Me.TokenEditEras.Properties.AutoHeightMode = DevExpress.XtraEditors.TokenEditAutoHeightMode.Expand
         Me.TokenEditEras.Properties.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
@@ -652,75 +715,85 @@ Partial Class Form1
         Me.TokenEditEras.Properties.Separators.AddRange(New String() {","})
         Me.TokenEditEras.Properties.ShowDropDown = False
         Me.TokenEditEras.Properties.ShowTokenGlyph = False
-        Me.TokenEditEras.Size = New System.Drawing.Size(272, 18)
+        Me.TokenEditEras.Size = New System.Drawing.Size(1061, 24)
         Me.TokenEditEras.StyleController = Me.LayoutControlSeasonPlanner
         Me.TokenEditEras.TabIndex = 11
         '
         'ConcertGrid6
         '
-        Me.ConcertGrid6.Location = New System.Drawing.Point(353, 289)
+        Me.ConcertGrid6.Location = New System.Drawing.Point(1214, 869)
+        Me.ConcertGrid6.Margin = New System.Windows.Forms.Padding(6)
         Me.ConcertGrid6.Name = "ConcertGrid6"
-        Me.ConcertGrid6.Size = New System.Drawing.Size(157, 113)
+        Me.ConcertGrid6.Size = New System.Drawing.Size(574, 368)
         Me.ConcertGrid6.TabIndex = 10
         Me.ConcertGrid6.Title = "Concert 6"
         '
         'ConcertGrid5
         '
-        Me.ConcertGrid5.Location = New System.Drawing.Point(353, 169)
+        Me.ConcertGrid5.Location = New System.Drawing.Point(1214, 481)
+        Me.ConcertGrid5.Margin = New System.Windows.Forms.Padding(6)
         Me.ConcertGrid5.Name = "ConcertGrid5"
-        Me.ConcertGrid5.Size = New System.Drawing.Size(157, 113)
+        Me.ConcertGrid5.Size = New System.Drawing.Size(574, 374)
         Me.ConcertGrid5.TabIndex = 9
         Me.ConcertGrid5.Title = "Concert 5"
         '
         'ConcertGrid4
         '
-        Me.ConcertGrid4.Location = New System.Drawing.Point(353, 49)
+        Me.ConcertGrid4.Location = New System.Drawing.Point(1214, 94)
+        Me.ConcertGrid4.Margin = New System.Windows.Forms.Padding(6)
         Me.ConcertGrid4.Name = "ConcertGrid4"
-        Me.ConcertGrid4.Size = New System.Drawing.Size(157, 113)
+        Me.ConcertGrid4.Size = New System.Drawing.Size(574, 373)
         Me.ConcertGrid4.TabIndex = 8
         Me.ConcertGrid4.Title = "Concert 4"
         '
         'ConcertGrid3
         '
-        Me.ConcertGrid3.Location = New System.Drawing.Point(190, 289)
+        Me.ConcertGrid3.Location = New System.Drawing.Point(628, 869)
+        Me.ConcertGrid3.Margin = New System.Windows.Forms.Padding(6)
         Me.ConcertGrid3.Name = "ConcertGrid3"
-        Me.ConcertGrid3.Size = New System.Drawing.Size(157, 113)
+        Me.ConcertGrid3.Size = New System.Drawing.Size(572, 368)
         Me.ConcertGrid3.TabIndex = 7
         Me.ConcertGrid3.Title = "Concert 3"
         '
         'ConcertGrid2
         '
-        Me.ConcertGrid2.Location = New System.Drawing.Point(190, 169)
+        Me.ConcertGrid2.Location = New System.Drawing.Point(628, 481)
+        Me.ConcertGrid2.Margin = New System.Windows.Forms.Padding(6)
         Me.ConcertGrid2.Name = "ConcertGrid2"
-        Me.ConcertGrid2.Size = New System.Drawing.Size(157, 113)
+        Me.ConcertGrid2.Size = New System.Drawing.Size(572, 374)
         Me.ConcertGrid2.TabIndex = 6
         Me.ConcertGrid2.Title = "Concert 2"
         '
         'ConcertGrid1
         '
-        Me.ConcertGrid1.Location = New System.Drawing.Point(190, 49)
+        Me.ConcertGrid1.Location = New System.Drawing.Point(628, 94)
+        Me.ConcertGrid1.Margin = New System.Windows.Forms.Padding(6)
         Me.ConcertGrid1.Name = "ConcertGrid1"
-        Me.ConcertGrid1.Size = New System.Drawing.Size(157, 113)
+        Me.ConcertGrid1.Size = New System.Drawing.Size(572, 373)
         Me.ConcertGrid1.TabIndex = 5
         Me.ConcertGrid1.Title = "Concert 1"
         '
         'GridControlSeasonPlanner
         '
-        Me.GridControlSeasonPlanner.Location = New System.Drawing.Point(13, 38)
+        Me.GridControlSeasonPlanner.EmbeddedNavigator.Margin = New System.Windows.Forms.Padding(6)
+        Me.GridControlSeasonPlanner.Location = New System.Drawing.Point(13, 51)
         Me.GridControlSeasonPlanner.MainView = Me.GridViewSeasonPlanner
+        Me.GridControlSeasonPlanner.Margin = New System.Windows.Forms.Padding(4)
         Me.GridControlSeasonPlanner.Name = "GridControlSeasonPlanner"
-        Me.GridControlSeasonPlanner.Size = New System.Drawing.Size(165, 382)
+        Me.GridControlSeasonPlanner.Size = New System.Drawing.Size(586, 1194)
         Me.GridControlSeasonPlanner.TabIndex = 1
         Me.GridControlSeasonPlanner.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewSeasonPlanner})
         '
         'GridViewSeasonPlanner
         '
         Me.GridViewSeasonPlanner.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
+        Me.GridViewSeasonPlanner.DetailHeight = 512
         Me.GridViewSeasonPlanner.GridControl = Me.GridControlSeasonPlanner
         Me.GridViewSeasonPlanner.Name = "GridViewSeasonPlanner"
         Me.GridViewSeasonPlanner.OptionsBehavior.Editable = False
         Me.GridViewSeasonPlanner.OptionsDetail.EnableMasterViewMode = False
         Me.GridViewSeasonPlanner.OptionsDragDrop.AllowSortedDataDragDrop = False
+        Me.GridViewSeasonPlanner.OptionsEditForm.PopupEditFormWidth = 1200
         Me.GridViewSeasonPlanner.OptionsLayout.StoreFormatRules = True
         Me.GridViewSeasonPlanner.OptionsMenu.ShowConditionalFormattingItem = True
         '
@@ -730,7 +803,7 @@ Partial Class Form1
         Me.Root.GroupBordersVisible = False
         Me.Root.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlGroupSeasonPlanningList, Me.SplitterItemSeasonPlanner, Me.LayoutControlGroupProposedSeason})
         Me.Root.Name = "Root"
-        Me.Root.Size = New System.Drawing.Size(787, 624)
+        Me.Root.Size = New System.Drawing.Size(1809, 1258)
         Me.Root.TextVisible = False
         '
         'LayoutControlGroupSeasonPlanningList
@@ -739,7 +812,7 @@ Partial Class Form1
         Me.LayoutControlGroupSeasonPlanningList.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlGroupSeasonPlanningList.Name = "LayoutControlGroupSeasonPlanningList"
         Me.LayoutControlGroupSeasonPlanningList.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonPlanningList.Size = New System.Drawing.Size(254, 604)
+        Me.LayoutControlGroupSeasonPlanningList.Size = New System.Drawing.Size(592, 1238)
         Me.LayoutControlGroupSeasonPlanningList.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
         Me.LayoutControlGroupSeasonPlanningList.Text = "Season Planner List"
         '
@@ -748,23 +821,23 @@ Partial Class Form1
         Me.LayoutControlItemSeasonPlannerGrid.Control = Me.GridControlSeasonPlanner
         Me.LayoutControlItemSeasonPlannerGrid.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonPlannerGrid.Name = "LayoutControlItemSeasonPlannerGrid"
-        Me.LayoutControlItemSeasonPlannerGrid.Size = New System.Drawing.Size(252, 577)
+        Me.LayoutControlItemSeasonPlannerGrid.Size = New System.Drawing.Size(590, 1198)
         Me.LayoutControlItemSeasonPlannerGrid.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonPlannerGrid.TextVisible = False
         '
         'SplitterItemSeasonPlanner
         '
         Me.SplitterItemSeasonPlanner.AllowHotTrack = True
-        Me.SplitterItemSeasonPlanner.Location = New System.Drawing.Point(254, 0)
+        Me.SplitterItemSeasonPlanner.Location = New System.Drawing.Point(592, 0)
         Me.SplitterItemSeasonPlanner.Name = "SplitterItemSeasonPlanner"
-        Me.SplitterItemSeasonPlanner.Size = New System.Drawing.Size(10, 604)
+        Me.SplitterItemSeasonPlanner.Size = New System.Drawing.Size(15, 1238)
         '
         'LayoutControlGroupProposedSeason
         '
         Me.LayoutControlGroupProposedSeason.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlGroupSeasonConcert1, Me.LayoutControlGroupSeasonConcert2, Me.LayoutControlGroupSeasonConcert3, Me.LayoutControlGroupSeasonConcert4, Me.LayoutControlGroupSeasonConcert5, Me.LayoutControlGroupSeasonConcert6, Me.LayoutControlItemSeasonEras})
-        Me.LayoutControlGroupProposedSeason.Location = New System.Drawing.Point(264, 0)
+        Me.LayoutControlGroupProposedSeason.Location = New System.Drawing.Point(607, 0)
         Me.LayoutControlGroupProposedSeason.Name = "LayoutControlGroupProposedSeason"
-        Me.LayoutControlGroupProposedSeason.Size = New System.Drawing.Size(503, 604)
+        Me.LayoutControlGroupProposedSeason.Size = New System.Drawing.Size(1182, 1238)
         Me.LayoutControlGroupProposedSeason.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
         Me.LayoutControlGroupProposedSeason.Text = "Propsed Season"
         '
@@ -772,11 +845,11 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert1.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert1.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert1})
-        Me.LayoutControlGroupSeasonConcert1.Location = New System.Drawing.Point(0, 27)
+        Me.LayoutControlGroupSeasonConcert1.Location = New System.Drawing.Point(0, 35)
         Me.LayoutControlGroupSeasonConcert1.Name = "LayoutControlGroupSeasonConcert1"
         Me.LayoutControlGroupSeasonConcert1.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert1.Size = New System.Drawing.Size(241, 180)
-        Me.LayoutControlGroupSeasonConcert1.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 4, 0, 8)
+        Me.LayoutControlGroupSeasonConcert1.Size = New System.Drawing.Size(580, 387)
+        Me.LayoutControlGroupSeasonConcert1.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 6, 0, 12)
         Me.LayoutControlGroupSeasonConcert1.TextVisible = False
         '
         'LayoutControlItemSeasonConcert1
@@ -785,7 +858,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert1.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert1.Name = "LayoutControlItemSeasonConcert1"
         Me.LayoutControlItemSeasonConcert1.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert1.Size = New System.Drawing.Size(235, 170)
+        Me.LayoutControlItemSeasonConcert1.Size = New System.Drawing.Size(572, 373)
         Me.LayoutControlItemSeasonConcert1.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert1.TextVisible = False
         '
@@ -793,11 +866,11 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert2.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert2.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert2})
-        Me.LayoutControlGroupSeasonConcert2.Location = New System.Drawing.Point(0, 207)
+        Me.LayoutControlGroupSeasonConcert2.Location = New System.Drawing.Point(0, 422)
         Me.LayoutControlGroupSeasonConcert2.Name = "LayoutControlGroupSeasonConcert2"
         Me.LayoutControlGroupSeasonConcert2.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert2.Size = New System.Drawing.Size(241, 180)
-        Me.LayoutControlGroupSeasonConcert2.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 4, 0, 8)
+        Me.LayoutControlGroupSeasonConcert2.Size = New System.Drawing.Size(580, 388)
+        Me.LayoutControlGroupSeasonConcert2.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 6, 0, 12)
         Me.LayoutControlGroupSeasonConcert2.TextVisible = False
         '
         'LayoutControlItemSeasonConcert2
@@ -806,7 +879,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert2.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert2.Name = "LayoutControlItemSeasonConcert2"
         Me.LayoutControlItemSeasonConcert2.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert2.Size = New System.Drawing.Size(235, 170)
+        Me.LayoutControlItemSeasonConcert2.Size = New System.Drawing.Size(572, 374)
         Me.LayoutControlItemSeasonConcert2.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert2.TextVisible = False
         '
@@ -814,11 +887,11 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert3.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert3.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert3})
-        Me.LayoutControlGroupSeasonConcert3.Location = New System.Drawing.Point(0, 387)
+        Me.LayoutControlGroupSeasonConcert3.Location = New System.Drawing.Point(0, 810)
         Me.LayoutControlGroupSeasonConcert3.Name = "LayoutControlGroupSeasonConcert3"
         Me.LayoutControlGroupSeasonConcert3.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert3.Size = New System.Drawing.Size(241, 172)
-        Me.LayoutControlGroupSeasonConcert3.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 4, 0, 0)
+        Me.LayoutControlGroupSeasonConcert3.Size = New System.Drawing.Size(580, 370)
+        Me.LayoutControlGroupSeasonConcert3.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 6, 0, 0)
         Me.LayoutControlGroupSeasonConcert3.TextVisible = False
         '
         'LayoutControlItemSeasonConcert3
@@ -827,7 +900,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert3.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert3.Name = "LayoutControlItemSeasonConcert3"
         Me.LayoutControlItemSeasonConcert3.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert3.Size = New System.Drawing.Size(235, 170)
+        Me.LayoutControlItemSeasonConcert3.Size = New System.Drawing.Size(572, 368)
         Me.LayoutControlItemSeasonConcert3.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert3.TextVisible = False
         '
@@ -835,11 +908,11 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert4.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert4.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert4})
-        Me.LayoutControlGroupSeasonConcert4.Location = New System.Drawing.Point(241, 27)
+        Me.LayoutControlGroupSeasonConcert4.Location = New System.Drawing.Point(580, 35)
         Me.LayoutControlGroupSeasonConcert4.Name = "LayoutControlGroupSeasonConcert4"
         Me.LayoutControlGroupSeasonConcert4.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert4.Size = New System.Drawing.Size(242, 180)
-        Me.LayoutControlGroupSeasonConcert4.Spacing = New DevExpress.XtraLayout.Utils.Padding(4, 0, 0, 8)
+        Me.LayoutControlGroupSeasonConcert4.Size = New System.Drawing.Size(582, 387)
+        Me.LayoutControlGroupSeasonConcert4.Spacing = New DevExpress.XtraLayout.Utils.Padding(6, 0, 0, 12)
         Me.LayoutControlGroupSeasonConcert4.TextVisible = False
         '
         'LayoutControlItemSeasonConcert4
@@ -848,7 +921,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert4.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert4.Name = "LayoutControlItemSeasonConcert4"
         Me.LayoutControlItemSeasonConcert4.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert4.Size = New System.Drawing.Size(236, 170)
+        Me.LayoutControlItemSeasonConcert4.Size = New System.Drawing.Size(574, 373)
         Me.LayoutControlItemSeasonConcert4.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert4.TextVisible = False
         '
@@ -856,11 +929,11 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert5.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert5.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert5})
-        Me.LayoutControlGroupSeasonConcert5.Location = New System.Drawing.Point(241, 207)
+        Me.LayoutControlGroupSeasonConcert5.Location = New System.Drawing.Point(580, 422)
         Me.LayoutControlGroupSeasonConcert5.Name = "LayoutControlGroupSeasonConcert5"
         Me.LayoutControlGroupSeasonConcert5.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert5.Size = New System.Drawing.Size(242, 180)
-        Me.LayoutControlGroupSeasonConcert5.Spacing = New DevExpress.XtraLayout.Utils.Padding(4, 0, 0, 8)
+        Me.LayoutControlGroupSeasonConcert5.Size = New System.Drawing.Size(582, 388)
+        Me.LayoutControlGroupSeasonConcert5.Spacing = New DevExpress.XtraLayout.Utils.Padding(6, 0, 0, 12)
         Me.LayoutControlGroupSeasonConcert5.TextVisible = False
         '
         'LayoutControlItemSeasonConcert5
@@ -869,7 +942,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert5.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert5.Name = "LayoutControlItemSeasonConcert5"
         Me.LayoutControlItemSeasonConcert5.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert5.Size = New System.Drawing.Size(236, 170)
+        Me.LayoutControlItemSeasonConcert5.Size = New System.Drawing.Size(574, 374)
         Me.LayoutControlItemSeasonConcert5.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert5.TextVisible = False
         '
@@ -877,11 +950,11 @@ Partial Class Form1
         '
         Me.LayoutControlGroupSeasonConcert6.GroupStyle = DevExpress.Utils.GroupStyle.Card
         Me.LayoutControlGroupSeasonConcert6.Items.AddRange(New DevExpress.XtraLayout.BaseLayoutItem() {Me.LayoutControlItemSeasonConcert6})
-        Me.LayoutControlGroupSeasonConcert6.Location = New System.Drawing.Point(241, 387)
+        Me.LayoutControlGroupSeasonConcert6.Location = New System.Drawing.Point(580, 810)
         Me.LayoutControlGroupSeasonConcert6.Name = "LayoutControlGroupSeasonConcert6"
         Me.LayoutControlGroupSeasonConcert6.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlGroupSeasonConcert6.Size = New System.Drawing.Size(242, 172)
-        Me.LayoutControlGroupSeasonConcert6.Spacing = New DevExpress.XtraLayout.Utils.Padding(4, 0, 0, 0)
+        Me.LayoutControlGroupSeasonConcert6.Size = New System.Drawing.Size(582, 370)
+        Me.LayoutControlGroupSeasonConcert6.Spacing = New DevExpress.XtraLayout.Utils.Padding(6, 0, 0, 0)
         Me.LayoutControlGroupSeasonConcert6.TextVisible = False
         '
         'LayoutControlItemSeasonConcert6
@@ -890,7 +963,7 @@ Partial Class Form1
         Me.LayoutControlItemSeasonConcert6.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonConcert6.Name = "LayoutControlItemSeasonConcert6"
         Me.LayoutControlItemSeasonConcert6.Padding = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0)
-        Me.LayoutControlItemSeasonConcert6.Size = New System.Drawing.Size(236, 170)
+        Me.LayoutControlItemSeasonConcert6.Size = New System.Drawing.Size(574, 368)
         Me.LayoutControlItemSeasonConcert6.TextSize = New System.Drawing.Size(0, 0)
         Me.LayoutControlItemSeasonConcert6.TextVisible = False
         '
@@ -899,28 +972,23 @@ Partial Class Form1
         Me.LayoutControlItemSeasonEras.Control = Me.TokenEditEras
         Me.LayoutControlItemSeasonEras.Location = New System.Drawing.Point(0, 0)
         Me.LayoutControlItemSeasonEras.Name = "LayoutControlItemSeasonEras"
-        Me.LayoutControlItemSeasonEras.Size = New System.Drawing.Size(483, 27)
-        Me.LayoutControlItemSeasonEras.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 5)
+        Me.LayoutControlItemSeasonEras.Size = New System.Drawing.Size(1162, 35)
+        Me.LayoutControlItemSeasonEras.Spacing = New DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 7)
         Me.LayoutControlItemSeasonEras.Text = "Season Eras"
-        Me.LayoutControlItemSeasonEras.TextSize = New System.Drawing.Size(59, 13)
-        '
-        'BarButtonItemClearSeasonPlanner
-        '
-        Me.BarButtonItemClearSeasonPlanner.Caption = "Clear Season Planner List"
-        Me.BarButtonItemClearSeasonPlanner.Id = 25
-        Me.BarButtonItemClearSeasonPlanner.Name = "BarButtonItemClearSeasonPlanner"
+        Me.LayoutControlItemSeasonEras.TextSize = New System.Drawing.Size(85, 19)
         '
         'Form1
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 19.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1206, 938)
+        Me.ClientSize = New System.Drawing.Size(1809, 1371)
         Me.Controls.Add(Me.TabPane1)
         Me.Controls.Add(Me.barDockControlLeft)
         Me.Controls.Add(Me.barDockControlRight)
         Me.Controls.Add(Me.barDockControlBottom)
         Me.Controls.Add(Me.barDockControlTop)
         Me.IconOptions.Icon = CType(resources.GetObject("Form1.IconOptions.Icon"), System.Drawing.Icon)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "HCS Music Recommendation and Library Tool"
@@ -1059,4 +1127,8 @@ Partial Class Form1
     Friend WithEvents TokenEditEras As DevExpress.XtraEditors.TokenEdit
     Friend WithEvents LayoutControlItemSeasonEras As DevExpress.XtraLayout.LayoutControlItem
     Friend WithEvents BarButtonItemClearSeasonPlanner As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents BarSubItemHelp As DevExpress.XtraBars.BarSubItem
+    Friend WithEvents BarButtonItemCheckForUpdate As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents BarButtonItemViewDocumentation As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents BarStaticItemVersion As DevExpress.XtraBars.BarStaticItem
 End Class

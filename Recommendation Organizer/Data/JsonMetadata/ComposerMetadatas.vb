@@ -7,9 +7,13 @@ Class ComposerMetadatas : Inherits BindingList(Of ComposerMetadata)
         If foundMetadata IsNot Nothing Then Return foundMetadata
 
         foundMetadata = New ComposerMetadata(composer)
-        foundMetadata.Load()
+        If foundMetadata.Load() Then
+            WorkMetadata.ClearCacheFor(foundMetadata)
 
-        Return foundMetadata
+            Return foundMetadata
+        End If
+
+        Return Nothing
     End Function
 
     Function Find(composer As IComposer) As ComposerMetadata
@@ -29,6 +33,8 @@ Class ComposerMetadata
     Function Load() As Boolean
         'https://api.openopus.org/composer/list/search/richard%20strauss.json
 
+        Dim possibleMatches As New List(Of ComposerSearchJsonResultComposer)
+
         For Each searchName As String In GetSearchNames()
             Dim webClient As New Net.WebClient()
             Dim json = webClient.DownloadString(New Uri($"https://api.openopus.org/composer/list/search/{searchName}.json"))
@@ -45,14 +51,42 @@ Class ComposerMetadata
                 Next
 
                 For Each jsonComposer In deserialized.composers
-                    If DevExpress.XtraEditors.XtraMessageBox.Show($"Is {jsonComposer.complete_name} a match for {Composer.PrimaryName}?", "Metadata Match?", MessageBoxButtons.YesNo) = DialogResult.Yes Then
-                        _Metadata = jsonComposer
-                        Return True
+                    If Not possibleMatches.Any(Function(x) x.id = jsonComposer.id) Then
+                        possibleMatches.Add(jsonComposer)
                     End If
                 Next
             End If
 
         Next
+
+        Dim scores As New List(Of (ComposerMetadata As ComposerSearchJsonResultComposer, Score As Double))
+        For Each possibleMatch In possibleMatches
+            Dim score = Extensions.StringExtensions.GetSimilarityScore(Composer.PrimaryName, possibleMatch.complete_name, True)
+            scores.Add((possibleMatch, score.OverallScore))
+        Next
+
+        scores.Sort(Function(x, y) y.Score.CompareTo(x.Score))
+        If scores.Count > 5 Then
+            scores = scores.Where(Function(x) x.Score > 0).ToList
+        End If
+        If scores.Count = 0 Then Return False
+
+        Dim matchForm = New MatchSelectForm()
+        matchForm.Initialize(Composer.PrimaryName, "Name", scores.Select(Function(x) x.ComposerMetadata.complete_name).ToList)
+        matchForm.ShowDialog()
+        Select Case matchForm.Result
+            Case MatchSelectForm.MatchResults.SelectionMade
+                Dim foundScore = scores.Find(Function(x) x.ComposerMetadata.complete_name = matchForm.MatchResult)
+                If foundScore.ComposerMetadata IsNot Nothing Then
+                    _Metadata = foundScore.ComposerMetadata
+                    Return True
+                End If
+            Case MatchSelectForm.MatchResults.NoMatch
+                    ' Do nothing
+            Case MatchSelectForm.MatchResults.Canceled
+                ' Cancel
+                Throw New Exception("Cancellation")
+        End Select
 
         Return False
 

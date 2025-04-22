@@ -128,28 +128,34 @@ Public Class MusicianRecommendation : Implements INotifyPropertyChanged, ICompos
     Private _HasChanges As Boolean
 
     Friend Shared Function GetRecommendationsFromCsvLine(line As ICsvLine) As IEnumerable(Of MusicianRecommendation)
-        Dim timeStamp As DateTime = Date.Parse(line(0))
-        Dim firstName As String = line(1)
-        Dim lastName As String = line(2)
-        Dim addlThoughts As String = If(line.ColumnCount > 18, line(18), Nothing)
-
-        Dim musician = New Musician() With {.FirstName = firstName.Trim, .LastName = lastName.Trim}
-
         Dim ret As New List(Of MusicianRecommendation)
 
-        For i As Integer = 0 To 4
-            Dim composerName = If(line.ColumnCount > 3 + (i * 3), line(3 + (i * 3)).Trim, Nothing)
-            Dim title = If(line.ColumnCount > 4 + (i * 3), line(4 + (i * 3)).Trim, Nothing)
-            Dim comment = If(line.ColumnCount > 5 + (i * 3), line(5 + (i * 3)).Trim, Nothing)
+        Try
+            Dim timeStamp As DateTime = Date.Parse(line(0))
+            Dim firstName As String = line(1)
+            Dim lastName As String = line(2)
+            Dim addlThoughts As String = If(line.ColumnCount > 18, line(18), Nothing)
 
-            If title <> Nothing Then
-                Dim key = firstName.Trim.ToUpper & lastName.Trim.ToUpper & timeStamp.ToString("yyyyMMddHHmmss") & composerName.Trim.ToUpper & title.Trim.ToUpper
-                Dim newRec As New MusicianRecommendation() With {.Composer = composerName, .Title = title, .Comments = comment, .Musician = musician, .AdditionalThoughts = addlThoughts, .TimeStamp = timeStamp, .Key = key}
-                ret.Add(newRec)
-            End If
-        Next
+            Dim musician = New Musician() With {.FirstName = firstName.Trim, .LastName = lastName.Trim}
 
-        Return ret
+            For i As Integer = 0 To 4
+                Dim composerName = If(line.ColumnCount > 3 + (i * 3), line(3 + (i * 3)).Trim, Nothing)
+                Dim title = If(line.ColumnCount > 4 + (i * 3), line(4 + (i * 3)).Trim, Nothing)
+                Dim comment = If(line.ColumnCount > 5 + (i * 3), line(5 + (i * 3)).Trim, Nothing)
+
+                If title <> Nothing Then
+                    Dim key = firstName.Trim.ToUpper & lastName.Trim.ToUpper & timeStamp.ToString("yyyyMMddHHmmss") & composerName.Trim.ToUpper & title.Trim.ToUpper
+                    Dim newRec As New MusicianRecommendation() With {.Composer = composerName, .Title = title, .Comments = comment, .Musician = musician, .AdditionalThoughts = addlThoughts, .TimeStamp = timeStamp, .Key = key}
+                    ret.Add(newRec)
+                End If
+            Next
+
+            Return ret
+        Catch ex As Exception
+            DevExpress.XtraEditors.XtraMessageBox.Show($"Could not import line: {Environment.NewLine}""{String.Join(""",""", line.Values)}""{Environment.NewLine}{Environment.NewLine}With error message '{ex.Message}'", "Import Error")
+            Return ret
+        End Try
+
     End Function
 
     Friend Sub UpdateFrom(mRec As MusicianRecommendation)

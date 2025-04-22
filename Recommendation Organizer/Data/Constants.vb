@@ -55,11 +55,11 @@ Public Module Constants
 
 #Region "Files and Paths - Library"
 
-    ReadOnly Property HttpPath_Library As String
-        Get
-            Return "https://jwd.gay/apps/hcs-library-tool/library.dat"
-        End Get
-    End Property
+    'ReadOnly Property HttpPath_Library As String
+    '    Get
+    '        Return "https://jwd.gay/apps/hcs-library-tool/library.dat"
+    '    End Get
+    'End Property
 
     ReadOnly Property FtpPath_Library As String
         Get
@@ -67,11 +67,11 @@ Public Module Constants
         End Get
     End Property
 
-    ReadOnly Property HttpPath_Library_Temp(uniqueString As String) As String
-        Get
-            Return $"https://jwd.gay/apps/hcs-library-tool/bak/library_{uniqueString}.dat"
-        End Get
-    End Property
+    'ReadOnly Property HttpPath_Library_Temp(uniqueString As String) As String
+    '    Get
+    '        Return $"https://jwd.gay/apps/hcs-library-tool/bak/library_{uniqueString}.dat"
+    '    End Get
+    'End Property
 
     ReadOnly Property FtpPath_Library_Temp(uniqueString As String) As String
         Get

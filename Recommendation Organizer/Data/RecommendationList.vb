@@ -73,7 +73,7 @@ Public Class RecommendationList : Inherits BindingList(Of Recommendation) : Impl
 
 End Class
 
-Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrangerTitleKey, IComposerAlternates, IMetadata, ISupportHasChanges
+Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrangerTitleKey, IComposerAlternates, IMetadata, ISupportHasChanges, IMetadataId
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
@@ -203,6 +203,13 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
             Return _Tags
         End Get
         Set(value As Tags)
+            If value IsNot Nothing Then
+                Dim blankVals = value.ToList.FindAll(Function(x) x.Name = Nothing)
+                For Each blankVal In blankVals
+                    value.Remove(blankVal)
+                Next
+            End If
+
             If _Tags IsNot value Then
                 HasChanges = True
                 _Tags = value
@@ -383,6 +390,19 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
 
     <Editable(False)>
     <Display(AutoGenerateField:=False)>
+    Public Property HasMetadataFromTitle As Boolean
+        Get
+            Return _HasMetadataFromTitle
+        End Get
+        Set(value As Boolean)
+            _HasMetadataFromTitle = value
+            RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(HasMetadataFromTitle)))
+        End Set
+    End Property
+    Private _HasMetadataFromTitle As Boolean
+
+    <Editable(False)>
+    <Display(AutoGenerateField:=False)>
     Public Property HasChanges As Boolean Implements ISupportHasChanges.HasChanges
         Get
             Return _HasChanges
@@ -394,11 +414,27 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
     End Property
     Private _HasChanges As Boolean = True
 
+    Public Property MetadataId As Integer Implements IMetadataId.MetadataId
+        Get
+            Return _MetadataId
+        End Get
+        Set(value As Integer)
+            _MetadataId = value
+            RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(MetadataId)))
+        End Set
+    End Property
+    Private _MetadataId As Integer = -1
+
     Friend Function IsMatch(mRec As IComposerTitleKey) As Boolean
         If Me.Key <> Nothing AndAlso mRec.Key <> Nothing AndAlso Me.Key = mRec.Key Then
             Return True
         End If
 
+        Return IsMatch(DirectCast(mRec, IComposerTitle))
+
+    End Function
+
+    Friend Function IsMatch(mRec As IComposerTitle) As Boolean
         Dim composerNames As New List(Of String) From {If(Me.Composer = Nothing, String.Empty, Me.Composer.ToUpper.Trim)}
         composerNames.AddRange(Me.AlternateComposerSpellings.Select(Function(x) x.ToUpper.Trim))
         If Me.Arranger <> Nothing Then
@@ -410,8 +446,8 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
 
         Dim recComposerName = If(mRec.Composer = Nothing, String.Empty, mRec.Composer.ToUpper.Trim)
         Dim recArrName = String.Empty
-        If TypeOf mRec Is IComposerArrangerTitleKey Then
-            recArrName = If(DirectCast(mRec, IComposerArrangerTitleKey).Arranger = Nothing, String.Empty, DirectCast(mRec, IComposerArrangerTitleKey).Arranger.ToUpper.Trim)
+        If TypeOf mRec Is IComposerArrangerTitle Then
+            recArrName = If(DirectCast(mRec, IComposerArrangerTitle).Arranger = Nothing, String.Empty, DirectCast(mRec, IComposerArrangerTitle).Arranger.ToUpper.Trim)
         End If
         Dim recTitle = If(mRec.Title = Nothing, String.Empty, mRec.Title.ToUpper.Trim)
 
@@ -419,6 +455,16 @@ Public Class Recommendation : Implements INotifyPropertyChanged, IComposerArrang
             Return True
         End If
 
+        Return False
+    End Function
+
+    Friend Function HasTitle(title As String) As Boolean
+        Dim allTitles As New List(Of String)
+        allTitles.Add(Me.Title.MakeAlphaNumeric({" "c}).ToLower)
+        allTitles.AddRange(Me.AlternateTitleSpellings.Select(Function(x) x.MakeAlphaNumeric({" "c}).ToLower))
+
+        Dim compareToTitle = title.MakeAlphaNumeric({" "c}).ToLower
+        If allTitles.Contains(compareToTitle) Then Return True
         Return False
     End Function
 
